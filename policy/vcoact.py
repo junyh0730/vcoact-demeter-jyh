@@ -8,8 +8,6 @@ class State(Enum):
     STAY = auto()
 
 
-
-
 class Vcoact():
     def __init__(self, env):
         self.actor = Actor(env)

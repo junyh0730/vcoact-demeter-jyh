@@ -1,5 +1,5 @@
 class VQMonitor():
-    def __init__(self):
+    def __init__(self,env):
         return
     
     def start(self):

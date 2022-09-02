@@ -10,10 +10,10 @@ class Monitor():
 
         self.start_time = -1
         self.end_time = -1
-        self.taskm = TaskMonitor()
-        self.hqm = HQMonitor()
-        self.vqm = VQMonitor()
-        self.cpum = CPUMonitor()
+        self.taskm = TaskMonitor(env)
+        self.hqm = HQMonitor(env)
+        self.vqm = VQMonitor(env)
+        self.cpum = CPUMonitor(env)
         return
     
     
@@ -27,19 +27,19 @@ class Monitor():
         return
     
     def end(self):
-        self.end_time = time.time()
         #end record
         self.taskm.end()
         self.hqm.end()
         self.vqm.end()
         self.cpum.end()
+        self.end_time = time.time()
         return
     
     def get(self):
         rst = None
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
         taskm_rst = self.taskm.get()
-        hqm_rst = self.hqm.get()
+        hqm_rst = self.hqm.get(diff_time)
         vqm_rst = self.vqm.get()
         cpum_rst = self.cpum.get(diff_time)
         

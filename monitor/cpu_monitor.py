@@ -3,7 +3,7 @@ import os
 from cgroupspy import trees
 
 class CPUMonitor():
-    def __init__(self):
+    def __init__(self,env):
         t = trees.Tree()
         cpuacct = t.get_node_by_path('/cpuacct')
         self.ctrl = cpuacct.controller

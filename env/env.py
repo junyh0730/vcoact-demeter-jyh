@@ -8,3 +8,4 @@ class Environment():
 
         self.debug = True
         self.period = 0.1 #s
+        self.hqm_ebpf_path = "monitor/hqm_ebpf.c"

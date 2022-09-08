@@ -1,9 +1,9 @@
-class TaskMonitor():
+class VQMonitorHPY():
     def __init__(self,env):
         return
     
     def start(self):
-        #start record
+            #start record
         return
     
     def end(self):

@@ -1,7 +1,7 @@
 import time
-from monitor.task_monitor import TaskMonitor
+from monitor.task_monitor_hyp import TaskMonitorHPY
 from monitor.hq_monitor import HQMonitor
-from monitor.vq_monitor import VQMonitor
+from monitor.vq_monitor_hyp import VQMonitorHPY
 from monitor.cpu_monitor import CPUMonitor
 
 class Monitor():
@@ -10,9 +10,9 @@ class Monitor():
 
         self.start_time = -1
         self.end_time = -1
-        self.taskm = TaskMonitor(env)
+        self.taskm = TaskMonitorHPY(env)
         self.hqm = HQMonitor(env)
-        self.vqm = VQMonitor(env)
+        self.vqm = VQMonitorHPY(env)
         self.cpum = CPUMonitor(env)
         return
     

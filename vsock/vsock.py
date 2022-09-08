@@ -25,7 +25,12 @@ class VSock():
         return
     
     def send(self, s):
-        self.tx_sock.sendall(s)
+        try:
+            self.tx_sock.sendall(s)
+        except:
+            print("tx fail")
+        
+        return
 
     
     def _start_rx(self):
@@ -59,8 +64,11 @@ class VSock():
         return
     
     def _start_tx(self):
-        self.tx_sock = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
-        self.tx_sock.connect((self.CID, self.PORT))
+        try:
+            self.tx_sock = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
+            self.tx_sock.connect((self.CID, self.PORT))
+        except:
+            print("connection fail")
 
         return 
     
@@ -70,9 +78,11 @@ class VSock():
             if not buf:
                 break
 
-            self.l_rx_buf.append(buf)
-            print(f"Received bytes: {buf}")
+            self._cb_rx(buf)
         return
+    
+    def _cb_rx(self,buf):
+        pass
     
     def __handle_tx(self):
 

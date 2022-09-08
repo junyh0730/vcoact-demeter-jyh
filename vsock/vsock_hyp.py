@@ -1,4 +1,5 @@
 from vsock.vsock import VSock
+from parser.parser import Parser
 import socket
 
 class VSockHYP(VSock):
@@ -16,4 +17,12 @@ class VSockHYP(VSock):
             super()._end_rx()
             super()._end_tx()
             
+        return
+    
+    def _cb_rx(self,buf):
+        #trans
+        [types, target, core_num, util] = Parser.transPktToData(buf)
+
+        #collecct info
+        self.actor_vm.alloc(target,core_num)
         return

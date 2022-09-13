@@ -6,6 +6,6 @@ class Environment():
         self.netinf_name = "enp101s0f0"
         self.server_ip = "10.150.21.215"
 
-        self.debug = True
+        self.debug = False
         self.period = 0.1 #s
         self.hqm_ebpf_path = "monitor/hqm_ebpf.c"

@@ -8,8 +8,11 @@ class VSock():
 
         self.logger = logging.getLogger("vsock_hyp")
         self.user = ""
-        self.CID = None
-        self.PORT = None
+        self.RX_CID = None
+        self.RX_PORT = None
+        self.TX_CID = None
+        self.TX_PORT = None
+
 
         self.RX_BUF_LEN = 256
 
@@ -38,7 +41,7 @@ class VSock():
             #listen
             logging.info("Listening")
             self.rx_sock = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
-            self.rx_sock.bind((self.CID, self.PORT))
+            self.rx_sock.bind((self.RX_CID, self.RX_PORT))
             self.rx_sock.listen()
             (conn, (remote_cid, remote_port)) = self.rx_sock.accept()
 
@@ -66,7 +69,7 @@ class VSock():
     def _start_tx(self):
         try:
             self.tx_sock = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
-            self.tx_sock.connect((self.CID, self.PORT))
+            self.tx_sock.connect((self.TX_CID, self.TX_PORT))
         except:
             print("connection fail")
 

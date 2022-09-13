@@ -1,6 +1,7 @@
 from vsock.vsock import VSock
 from vsock.parser import Parser
 from in_vm.actor_vm import ActorVM
+import socket
 
 class VSockVM(VSock):
     def __init__(self,actor_vm):
@@ -8,8 +9,11 @@ class VSockVM(VSock):
 
         self.user = "vm"
         CID_VM = 3
-        self.CID = CID_VM
-        self.PORT = 9998
+        self.TX_CID = socket.VMADDR_CID_HOST
+        self.TX_PORT = 9999
+        self.RX_CID = CID_VM
+        self.RX_PORT = 9998
+
 
         self.actor_vm = actor_vm
     

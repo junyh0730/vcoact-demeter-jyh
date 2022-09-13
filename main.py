@@ -2,6 +2,7 @@ import sys
 from env.env import Environment
 from monitor.monitor import Monitor
 from policy.vcoact import Vcoact
+from vsock.vsock_hyp import VSockHYP
 import time
 
 sys.path.append("/home/caslab/vcoact")
@@ -12,6 +13,8 @@ def run():
     global env
     agent = Vcoact(env)
     monitor = Monitor(env)
+    vsock_hyp = VSockHYP()
+    vsock_hyp.start()
 
     itr = 0
 

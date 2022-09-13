@@ -24,5 +24,7 @@ class VSockHYP(VSock):
         [types, target, core_num, util] = Parser.transPktToData(buf)
 
         #collecct info
-        self.actor_vm.alloc(target,core_num)
+        if types == 'act':
+            self.actor_vm.alloc(target, core_num)
+            
         return

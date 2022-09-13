@@ -22,7 +22,7 @@ class VSock():
         return
     
     def start(self):
-        return
+        pass
     
     def send(self, s):
         try:
@@ -85,11 +85,11 @@ class VSock():
         pass
     
     def __handle_tx(self):
+        pass
 
-        return
     
     def _end_rx(self):
-        return
+        pass
     
     def _end_tx(self):
         self.tx_sock.close()

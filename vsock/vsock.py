@@ -48,7 +48,7 @@ class VSock():
             #connection
             self.logger.debug("Got connection")
             print(f"Connection opened by cid={remote_cid} port={remote_port}")
-            process = multiprocessing.Process(target=self.__handle_rx, args=(conn))
+            process = multiprocessing.Process(target=self.__handle_rx, args=(conn,))
             process.daemon = True
             process.start()
             self.logger.debug("Started process %r", process)
@@ -57,11 +57,10 @@ class VSock():
             logging.exception("Unexpected exception")
 
         finally:
-            logging.info("Shutting down")
             for process in multiprocessing.active_children():
+                process.join()
                 logging.info("Shutting down process %r", process)
                 process.terminate()
-                process.join()
 
         logging.info("All done")
         return

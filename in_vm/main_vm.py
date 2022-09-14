@@ -53,11 +53,10 @@ def sendInfo(vsock_vm_daemon, rst):
     l_rst_target = ["task", "vq"]
     for target, util in zip(l_rst_target,rst):
         #trans
-        l_pkt = Parser.transInfoToPkt(target, util)
+        pkt = Parser.transInfoToPkt(target, util)
 
         #send
-        for pkt in l_pkt:
-            vsock_vm_daemon.send(pkt)
+        vsock_vm_daemon.send(pkt)
     
     return
     

@@ -1,3 +1,6 @@
+from math import remainder
+
+
 class Parser():
     def __init__(self):
         #type
@@ -5,37 +8,45 @@ class Parser():
 
     def transPktToData(pkt):
         strings = pkt.decode('UTF-8')
-        strings = strings.split(' ')
-        types = strings[0]
+        strings = strings.split('\n')
+        res_strings = list()
+        remainder = bytearray()
 
-        print(strings)
+        for s in strings:
+            a_s = s.split(' ')
 
-        if types == 'act':
-            #|Type|Target|core_num|
-            target = strings[1]
-            core_num = strings[2]
-            return [types, target, core_num, -1]
-            
-        elif types == 'info':
-            #|Type|Target|core_num|util|
-            target = strings[1]
-            core_num = strings[2]
-            util = strings[3]
-            return [types, target, core_num, util]
+            try: 
+                types = a_s[0]
+                target = a_s[1]
+                core_num = a_s[2]
+                util = a_s[3]
+            except:
+                remainder.extend(s.encode('utf-8'))
+                break
+
+            if types == 'act':
+                #|Type|Target|core_num|
+                res_strings.append([types, target, core_num, -1])
+                
+            elif types == 'info':
+                #|Type|Target|core_num|util|
+                res_strings.append([types, target, core_num, util])
         
-        return None
+        print(res_strings)
+            
+        return res_strings, remainder
 
     def transInfoToPkt(target, utils):
-        l_info = list()
+        s_info = ""
         for core, u in enumerate(utils):
-            info = "info " + str(target) + " " + str(core) + " " +str(u) + " \n"
+            info = "info " + str(target) + " " + str(core) + " " +str(u) + " \n "
             info = info.encode('utf-8')
-            l_info.append(info)
+            s_info += info
         
-        return l_info
+        return s_info
     
     def transActToPkt(target, core_num):
-        act = "act " + str(target) + " " + str(core_num) + " \n"
+        act = "act " + str(target) + " " + str(core_num) + " \n "
         act = act.encode('utf-8')
         return act
 

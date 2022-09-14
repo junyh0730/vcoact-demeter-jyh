@@ -13,6 +13,8 @@ class VSockHYP(VSock):
         self.TX_CID = CID_VM
         self.TX_PORT = 9998
 
+        self.rx_data = bytearray() 
+
     
     def start(self):
         try: 
@@ -27,10 +29,13 @@ class VSockHYP(VSock):
     
     def _cb_rx(self,buf):
         #trans
-        [types, target, core_num, util] = Parser.transPktToData(buf)
+        self.rx_data.extend(buf)
+        res, remainder = Parser.transPktToData(self.rx_data)
+        self.rx_data = remainder
 
-        #collecct info
-        if types == 'act':
-            self.actor_vm.alloc(target, core_num)
+        for types, target, core_num, util in res:
+            #collecct info
+            if types == 'act':
+                self.actor_vm.alloc(target, core_num)
 
         return

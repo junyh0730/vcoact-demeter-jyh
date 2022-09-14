@@ -13,7 +13,7 @@ class Parser():
         remainder = bytearray()
 
         for s in strings:
-            a_s = s.split(' ')
+            a_s = s.split()
 
             try: 
                 types = a_s[0]

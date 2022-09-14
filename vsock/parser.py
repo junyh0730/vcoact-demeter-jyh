@@ -11,7 +11,7 @@ class Parser():
             #|Type|Target|core_num|
             target = strings[1]
             core_num = strings[2]
-            return [types, target, core_num, ""]
+            return [types, target, core_num, None]
             
         elif types == 'info':
             #|Type|Target|core_num|util|

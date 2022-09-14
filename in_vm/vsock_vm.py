@@ -14,18 +14,23 @@ class VSockVM(VSock):
         self.RX_CID = CID_VM
         self.RX_PORT = 9998
 
-
         self.actor_vm = actor_vm
+
     
     def start(self):
         try: 
             super()._start_tx()
             super()._start_rx()
-        finally:
-            super()._end_tx()
-            super()._end_rx()
-            
+
+        except:
+            print("vsock: start error")
+                        
         return
+    
+    def end(self):
+        super()._end_tx()
+        super()._end_rx()
+
     
     def _cb_rx(self,buf):
         #trans

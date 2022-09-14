@@ -1,6 +1,7 @@
 from vsock.vsock import VSock
 from vsock.parser import Parser
 import socket
+import time
 
 class VSockHYP(VSock):
     def __init__(self):
@@ -16,6 +17,7 @@ class VSockHYP(VSock):
     def start(self):
         try: 
             super()._start_rx()
+            time.sleep(3)
             super()._start_tx()
         finally:
             super()._end_rx()

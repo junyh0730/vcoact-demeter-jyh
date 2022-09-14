@@ -46,7 +46,7 @@ class VSock():
             (conn, (remote_cid, remote_port)) = self.rx_sock.accept()
 
             #connection
-            self.logger.debug("Got connection")
+            self.logger.debug("Got Rx connection")
             print(f"Connection opened by cid={remote_cid} port={remote_port}")
             process = multiprocessing.Process(target=self.__handle_rx, args=(conn,))
             process.daemon = True
@@ -55,22 +55,16 @@ class VSock():
 
         except:
             logging.exception("Unexpected exception")
-
-        finally:
-            for process in multiprocessing.active_children():
-                process.join()
-                logging.info("Shutting down process %r", process)
-                process.terminate()
-
-        logging.info("All done")
-        return
+        
+        return 
     
     def _start_tx(self):
         try:
             self.tx_sock = socket.socket(socket.AF_VSOCK, socket.SOCK_STREAM)
             self.tx_sock.connect((self.TX_CID, self.TX_PORT))
+            print("tx conn succ")
         except:
-            print("connection fail")
+            print("tx conn fail")
 
         return 
     
@@ -91,7 +85,12 @@ class VSock():
 
     
     def _end_rx(self):
-        pass
+        for process in multiprocessing.active_children():
+            process.join()
+            logging.info("Shutting down process %r", process)
+            process.terminate()
+
+        logging.info("All done")
     
     def _end_tx(self):
         self.tx_sock.close()

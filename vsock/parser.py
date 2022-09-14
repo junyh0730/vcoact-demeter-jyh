@@ -31,8 +31,6 @@ class Parser():
             elif types == 'info':
                 #|Type|Target|core_num|util|
                 res_strings.append([types, target, core_num, util])
-        
-        print(res_strings)
             
         return res_strings, remainder
 
@@ -40,9 +38,11 @@ class Parser():
         s_info = ""
         for core, u in enumerate(utils):
             info = "info " + str(target) + " " + str(core) + " " +str(u) + " \n "
-            info = info.encode('utf-8')
             s_info += info
-        
+
+        print(s_info)
+
+        s_info = s_info.encode('utf-8')
         return s_info
     
     def transActToPkt(target, core_num):

@@ -42,11 +42,11 @@ class VQMonitorVM():
         l_softirq_usage = [0.0] * self.env.max_core
         dist = self.dist_irq
         for k, v in sorted(sorted(dist.items(), key=lambda dist: dist[0].cpu), key=lambda dist: dist[0].vec):
-            if "net_rx" in self.vec_to_name(k.vec):
+            if "net_rx" or "net_tx" in self.vec_to_name(k.vec):
                 if k.cpu < self.env.max_core:
-                    l_softirq_usage[k.cpu] = v.value
+                    l_softirq_usage[k.cpu] += v.value
         #self.dist_irq.clear()
-        #print("softirq: ", l_softirq_usage)
+        print("softirq: ", l_softirq_usage)
         return l_softirq_usage
 
     def clear_softirq_usage(self):

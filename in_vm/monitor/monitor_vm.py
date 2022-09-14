@@ -15,7 +15,7 @@ class MonitorVM():
         return
     
     def start(self):
-        self.end_time = time.time()
+        self.start_time = time.time()
         self.tm_vm.start()
         self.vqm_vm.start()
         return

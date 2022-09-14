@@ -34,7 +34,7 @@ class VSockVM(VSock):
     
     def _cb_rx(self,buf):
         #trans
-        [types, target, core_num] = Parser.transPktToData(buf)
+        types, target, core_num, util = Parser.transPktToData(buf)
 
         #alloc core
         self.actor_vm.alloc(target,core_num)

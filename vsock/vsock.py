@@ -14,7 +14,7 @@ class VSock():
         self.TX_PORT = None
 
 
-        self.RX_BUF_LEN = 256
+        self.RX_BUF_LEN = 1024
 
         self.l_rx_buf = list()
         self.l_tx_buf = list()

@@ -7,11 +7,7 @@ class VQMonitorVM():
         #text replace
         bpf_text = bpf_text.replace(
             'DEF_MAX_CORE', "#define MAX_CORE " + str(env.max_core))
-        bpf_text = bpf_text.replace('STORE',
-                                              'key.vec = valp->vec; ' +
-                                              'key.cpu = entry_key.cpu;' +
-                                              'dist_irq.atomic_increment(key, delta);'
-                                              )
+        
         self.b = BPF(text=bpf_text)
         self.dist_irq = self.b.get_table("dist_irq")
         self.start_softirq_usage = []

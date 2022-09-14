@@ -7,11 +7,6 @@ class HQMonitor():
         #text replace
         bpf_text = bpf_text.replace(
             'DEF_MAX_CORE', "#define MAX_CORE " + str(env.max_core))
-        bpf_text = bpf_text.replace('STORE',
-                                              'key.vec = valp->vec; ' +
-                                              'key.cpu = entry_key.cpu;' +
-                                              'dist_irq.atomic_increment(key, delta);'
-                                              )
         self.b = BPF(text=bpf_text)
         self.dist_irq = self.b.get_table("dist_irq")
         self.start_softirq_usage = []
@@ -44,6 +39,7 @@ class HQMonitor():
         for k, v in sorted(sorted(dist.items(), key=lambda dist: dist[0].cpu), key=lambda dist: dist[0].vec):
             if "net_rx" in self.vec_to_name(k.vec):
                 if k.cpu < self.env.max_core:
+                    print(k.cpu, v.value)
                     l_softirq_usage[k.cpu] = v.value
         #self.dist_irq.clear()
         #print("softirq: ", l_softirq_usage)

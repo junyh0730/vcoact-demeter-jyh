@@ -25,9 +25,13 @@ class VSock():
         return
     
     def start(self):
+        
         pass
     
     def send(self, s):
+        if self.env.vsock_enable == False:
+            return None
+
         try:
             self.tx_sock.sendall(s)
         except:

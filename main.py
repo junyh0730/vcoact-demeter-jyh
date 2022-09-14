@@ -13,7 +13,7 @@ def run():
     global env
     agent = Vcoact(env)
     monitor = Monitor(env)
-    vsock_hyp = VSockHYP()
+    vsock_hyp = VSockHYP(env)
     vsock_hyp.start()
 
     itr = 0

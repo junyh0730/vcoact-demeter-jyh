@@ -7,18 +7,18 @@
 #error "IFNAMSIZ != 16 is not supported"
 #endif
 #define MAX_QUEUE_NUM 1024
-#define PER_SLOT_SIZE 100
 
 typedef struct entry_key
 {
     u32 pid;
     u32 cpu;
+    u32 vec;
 } entry_key_t;
+
 
 typedef struct irq_key
 {
     u32 vec;
-    u64 slot;
     u32 cpu;
 } irq_key_t;
 
@@ -29,7 +29,7 @@ typedef struct irq_account_val
 } irq_account_val_t;
 
 BPF_HASH(irq_start, entry_key_t, irq_account_val_t);
-BPF_HISTOGRAM(dist_irq, irq_key_t);
+BPF_HISTOGRAM(dist_irq, irq_key_t, 1024);
 
 TRACEPOINT_PROBE(irq, softirq_entry)
 {
@@ -38,8 +38,8 @@ TRACEPOINT_PROBE(irq, softirq_entry)
 
     key.pid = bpf_get_current_pid_tgid();
     key.cpu = bpf_get_smp_processor_id();
+    key.vec = args->vec;
     val.ts = bpf_ktime_get_ns();
-    val.vec = args->vec;
 
     irq_start.update(&key, &val);
 
@@ -56,6 +56,7 @@ TRACEPOINT_PROBE(irq, softirq_exit)
 
     entry_key.pid = bpf_get_current_pid_tgid();
     entry_key.cpu = bpf_get_smp_processor_id();
+    entry_key.vec = args->vec;
 
     // fetch timestamp and calculate delta
     valp = irq_start.lookup(&entry_key);
@@ -64,10 +65,12 @@ TRACEPOINT_PROBE(irq, softirq_exit)
         return 0; // missed start
     }
     delta = (bpf_ktime_get_ns() - valp->ts);
-    vec = valp->vec;
 
-    // store as sum or histogram
-    STORE
+    irq_key_t irq_key;
+    irq_key.cpu = entry_key.cpu;
+    irq_key.vec = entry_key.vec;
+
+    dist_irq.increment(irq_key, delta);
 
     irq_start.delete(&entry_key);
     return 0;

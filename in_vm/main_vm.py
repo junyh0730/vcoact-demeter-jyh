@@ -13,7 +13,7 @@ env = Environment()
 def run():
     global env
     actor = ActorVM(env)
-    vsock_vm_daemon = VSockVM(actor)
+    vsock_vm_daemon = VSockVM(actor,env)
     vsock_vm_daemon.start()
         
     main_loop(vsock_vm_daemon, actor)

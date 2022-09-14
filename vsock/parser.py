@@ -7,13 +7,13 @@ class Parser():
         return
 
     def transPktToData(pkt):
-        strings = pkt.decode('UTF-8')
+        strings = pkt.decode('utf-8')
         strings = strings.split('\n')
         res_strings = list()
         remainder = bytearray()
 
         for s in strings:
-            a_s = s.split(' ')
+            a_s = s.split()
 
             try: 
                 types = a_s[0]
@@ -37,16 +37,14 @@ class Parser():
     def transInfoToPkt(target, utils):
         s_info = ""
         for core, u in enumerate(utils):
-            info = "info " + str(target) + " " + str(core) + " " +str(u) + " \n "
+            info = "info " + str(target) + " " + str(core) + " " +str(u) + " \n"
             s_info += info
-
-        print(s_info)
 
         s_info = s_info.encode('utf-8')
         return s_info
     
     def transActToPkt(target, core_num):
-        act = "act " + str(target) + " " + str(core_num) + " \n "
+        act = "act " + str(target) + " " + str(core_num) + " \n"
         act = act.encode('utf-8')
         return act
 

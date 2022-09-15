@@ -28,3 +28,6 @@ vsock/__pycache__/parser.cpython-38.pyc
 vsock/__pycache__/vsock_hyp.cpython-38.pyc
 vsock/__pycache__/vsock.cpython-38.pyc
 actor/__pycache__/actor_hyp.cpython-38.pyc
+monitor/vm/__pycache__/monitor_vm.cpython-38.pyc
+monitor/vm/__pycache__/task_monitor_vm.cpython-38.pyc
+monitor/vm/__pycache__/vq_monitor_vm.cpython-38.pyc

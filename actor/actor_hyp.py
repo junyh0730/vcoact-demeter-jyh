@@ -71,6 +71,7 @@ class ActorHyp():
             cset_vhost = t.get_node_by_path('/cpuset/vhost')
 
         self.cset_ctrl = cset_vhost.controller
+
         grep_cmd="ps -eLF | grep \"vhost-\" |awk '{print $4}'"
         vhost_tids = subprocess.check_output(grep_cmd,shell=True)
         vhost_tids = vhost_tids.decode('utf-8').split()

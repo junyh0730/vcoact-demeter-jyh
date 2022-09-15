@@ -68,7 +68,22 @@ class ActorVM():
     def __init_cset_ctrl(self):
         t = trees.Tree()
         cset = t.get_node_by_path('/cpuset/')
-        self.cset_ctrl = cset.controller
+        cset_tasks = None
+        try:
+            cset_tasks = cset.create_cgroup('all_thread')
+        except:
+            cset_tasks = t.get_node_by_path('/cpuset/all_thread')
+
+        self.cset_ctrl = cset_tasks.controller
+
+        grep_cmd = "ps -eLF |awk '{print $4}' | awk '{if (NR!=1) {print}}'"
+        tids = subprocess.check_output(grep_cmd,shell=True).decode('utf-8').split()
+
+        for t in tids:
+            try:
+                self.cset_ctrl.tasks = [t]
+            except:
+                continue
         
         return
 
@@ -86,7 +101,8 @@ class ActorVM():
         target_num = target['end'] - target['start'] + 1
 
         for l_fd_irq_aff, l_fd_irq_aff_list in zip(self.ll_fd_irq_aff, self.ll_fd_irq_aff_list):
-            #init
+
+            #init param
             core = 0
             aff = 1
             max_aff = 1 << target_num 

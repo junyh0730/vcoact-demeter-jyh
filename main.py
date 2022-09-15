@@ -3,6 +3,7 @@ from env.env import Environment
 from monitor.monitor import Monitor
 from policy.vcoact import Vcoact
 from vsock.vsock_hyp import VSockHYP
+from actor.actor_hyp import ActorHyp
 import time
 
 sys.path.append("/home/caslab/vcoact")
@@ -11,9 +12,11 @@ env = Environment()
 
 def run():
     global env
-    agent = Vcoact(env)
     monitor = Monitor(env)
     vsock_hyp = VSockHYP(env)
+    actor_hyp = ActorHyp(env)
+    agent = Vcoact(env)
+
     vsock_hyp.start()
 
     itr = 0
@@ -25,7 +28,8 @@ def run():
         monitor.end()
 
         result = monitor.get()
-        agent.step(result)
+        action = agent.step(result)
+        actor_hyp.act(action)
 
         itr += 1
         

@@ -1,6 +1,6 @@
 from vsock.vsock import VSock
 from vsock.parser import Parser
-from in_vm.actor_vm import ActorVM
+from actor.actor_vm import ActorVM
 import socket
 
 class VSockVM(VSock):

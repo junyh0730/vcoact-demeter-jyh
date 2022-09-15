@@ -39,7 +39,6 @@ class HQMonitor():
         for k, v in sorted(sorted(dist.items(), key=lambda dist: dist[0].cpu), key=lambda dist: dist[0].vec):
             if "net_rx" in self.vec_to_name(k.vec):
                 if k.cpu < self.env.max_core:
-                    print(k.cpu, v.value)
                     l_softirq_usage[k.cpu] = v.value
         #self.dist_irq.clear()
         #print("softirq: ", l_softirq_usage)

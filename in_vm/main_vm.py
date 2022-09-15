@@ -3,10 +3,10 @@ import time
 sys.path.append("/home/vm/vcoact")
 
 from env.env import Environment
-from in_vm.monitor.monitor_vm import MonitorVM
-from in_vm.vsock_vm import VSockVM
+from monitor.vm.monitor_vm import MonitorVM
+from vsock.vsock_vm import VSockVM
 from vsock.parser import Parser
-from in_vm.actor_vm import ActorVM
+from actor.actor_vm import ActorVM
 
 env = Environment()
 

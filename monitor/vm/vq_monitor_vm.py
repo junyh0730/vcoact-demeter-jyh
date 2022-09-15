@@ -2,7 +2,7 @@ from bcc import BPF
 class VQMonitorVM():
     def __init__(self, env): 
         self.env = env
-        f = open("./monitor/vqm_ebpf.c")
+        f = open("./vqm_ebpf.c")
         bpf_text = f.read()
         #text replace
         bpf_text = bpf_text.replace(

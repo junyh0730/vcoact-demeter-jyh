@@ -1,6 +1,6 @@
 import time
-from in_vm.monitor.task_monitor_vm import TaskMonitorVM
-from in_vm.monitor.vq_monitor_vm import VQMonitorVM 
+from monitor.vm.task_monitor_vm import TaskMonitorVM
+from monitor.vm.vq_monitor_vm import VQMonitorVM 
 
 class MonitorVM():
     def __init__(self,env):

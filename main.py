@@ -13,8 +13,8 @@ env = Environment()
 def run():
     global env
     monitor = Monitor(env)
-    vsock_hyp = VSockHYP(env)
     actor_hyp = ActorHyp(env)
+    vsock_hyp = VSockHYP(env,monitor,actor_hyp)
     agent = Vcoact(env)
 
     vsock_hyp.start()
@@ -28,11 +28,16 @@ def run():
         monitor.end()
 
         result = monitor.get()
-        action = agent.step(result)
-        actor_hyp.act(action)
+
+        if env.mode == "vcoact":
+            action = agent.step(result)
+            actor_hyp.act(action)
+
+        elif env.mode == "monitor":
+            pass
 
         itr += 1
-        
+    
     return
 
 

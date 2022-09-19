@@ -31,3 +31,4 @@ actor/__pycache__/actor_hyp.cpython-38.pyc
 monitor/vm/__pycache__/monitor_vm.cpython-38.pyc
 monitor/vm/__pycache__/task_monitor_vm.cpython-38.pyc
 monitor/vm/__pycache__/vq_monitor_vm.cpython-38.pyc
+monitor.log

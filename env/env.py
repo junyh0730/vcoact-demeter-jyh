@@ -10,7 +10,9 @@ class Environment():
         self.vm_name = "ubuntu18.04"
 
         self.debug = True
-        self.period = 1 #s
+        self.mode = "monitor" 
+        #self.mode = "vcoact" 
+        self.period = 0.1 #s
         self.hqm_ebpf_path = "monitor/hqm_ebpf.c"
 
-        self.vsock_enable = False 
+        self.vsock_enable = True

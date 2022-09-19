@@ -4,10 +4,13 @@ import socket
 import time
 
 class VSockHYP(VSock):
-    def __init__(self,env):
+    def __init__(self,env,monitor,actor):
         super().__init__()
         self.env = env
         self.user = "hyp"
+        self.monitor = monitor
+        self.actor = actor
+
         CID_VM = 3
         self.RX_CID = socket.VMADDR_CID_HOST
         self.RX_PORT = 9999
@@ -47,7 +50,16 @@ class VSockHYP(VSock):
 
         for types, target, core_num, util in res:
             #collecct info
-            if types == 'act':
-                self.actor_vm.alloc(target, core_num)
+            if types == 'info':
+                self.monitor.set_info(target, core_num, util)
+
+            elif types == 'act':
+                if target == "hq":
+                    self.actor.alloc_hq_core(core_num)
+                elif target == "vhost":
+                    self.actor.alloc_vhost_core(core_num)
+                elif target == "vm":
+                    self.actor.alloc_vm_core(core_num)
+
 
         return

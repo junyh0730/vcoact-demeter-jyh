@@ -12,9 +12,6 @@ class Vcoact():
         return
     
     def step(self,rst):
-        task_s, hq_s, vq_s, vcpu_s = State.STAY, State.STAY, State.STAY, State.STAY
-        taskm_rst, hqm_rst, vqm_rst, vcpum_rst = rst
-
         action = None
         #decide load of each core allocation
 

@@ -5,6 +5,7 @@ from policy.vcoact import Vcoact
 from vsock.vsock_hyp import VSockHYP
 from actor.actor_hyp import ActorHyp
 import time
+import socket
 
 sys.path.append("/home/caslab/vcoact")
 
@@ -18,26 +19,56 @@ def run():
     agent = Vcoact(env)
 
     vsock_hyp.start()
+    monitor.set_vsock(vsock_hyp)
 
     itr = 0
 
     # main loop
-    while True:
-        monitor.start()
-        time.sleep(env.period)
-        monitor.end()
+    if env.mode == 'vcoact':
+        while True:
+            monitor.start()
+            time.sleep(env.period)
+            monitor.end()
 
-        result = monitor.get()
+            result = monitor.get()
 
-        if env.mode == "vcoact":
             action = agent.step(result)
             actor_hyp.act(action)
 
-        elif env.mode == "monitor":
-            pass
-
-        itr += 1
+            itr += 1
     
+    elif env.mode == 'monitor':
+        print('start monitor mode')
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((env.server_ip, 9995))
+        s.listen()
+        while True:
+            conn, addr = s.accept()
+
+            try:
+                data = conn.recv(2048)
+            except socket.error:
+                break
+
+            e = data.decode('utf-8')
+
+            if e == 'start':
+                #start monitor
+                if env.debug:
+                    print("start monitor")
+                monitor.start()
+                continue
+
+            elif e == 'end':
+                #end monitor
+                if env.debug:
+                    print("end monitor")
+                monitor.end()
+                break
+        
+        monitor.get()
+        
     return
 
 

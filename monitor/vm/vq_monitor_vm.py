@@ -42,7 +42,7 @@ class VQMonitorVM():
                 if k.cpu < self.env.max_core:
                     l_softirq_usage[k.cpu] += v.value
         #self.dist_irq.clear()
-        print("softirq: ", l_softirq_usage)
+        #print("softirq: ", l_softirq_usage)
         return l_softirq_usage
 
     def clear_softirq_usage(self):

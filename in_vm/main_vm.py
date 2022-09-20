@@ -1,5 +1,5 @@
 import sys
-import threading
+import multiprocessing
 import time
 sys.path.append("/home/vm/vcoact")
 
@@ -10,8 +10,8 @@ from vsock.parser import Parser
 from actor.actor_vm import ActorVM
 
 env = Environment()
-start_e = threading.Event()
-end_e = threading.Event()
+start_e = multiprocessing.Event()
+end_e = multiprocessing.Event()
 
 def run():
     global env,start_e,end_e
@@ -45,8 +45,8 @@ def main_loop(vsock_vm_daemon, actor):
 
     elif env.mode == 'monitor':
         #init
-        start_e, end_e = monitor_vm.get_e()
-        vsock_vm_daemon.set_e(start_e,end_e)
+        #start_e, end_e = monitor_vm.get_e()
+        #vsock_vm_daemon.set_e(start_e,end_e)
 
         while True:
             #wait start signal from hyp
@@ -67,6 +67,9 @@ def main_loop(vsock_vm_daemon, actor):
             rst = monitor_vm.get()
             sendInfo(vsock_vm_daemon, rst)
             print("send info")
+
+            start_e.clear()
+            end_e.clear()
 
     return
 

@@ -44,20 +44,26 @@ class VSockVM(VSock):
     
     def _cb_rx(self,buf):
         #trans
-        types, target, core_num, util = Parser.transPktToData(buf)
+
+        self.rx_data.extend(buf)
+        res, remainder = Parser.transPktToData(self.rx_data)
+        self.rx_data = remainder
+
 
         #act
-        if types == "act":
-            if target == "start":
-                self.start_e.set()
 
-            elif target == "end":
-                self.end_e.set()
+        for types, target, core_num, util in res:
+            if types == "act":
+                if target == "start":
+                    self.start_e.set()
 
-            elif target == "t":
-                self.actor_vm.alloc_t_core(core_num)
+                elif target == "end":
+                    self.end_e.set()
 
-            elif target == "vq":
-                self.actor_vm.alloc_vq_core(core_num)
+                elif target == "t":
+                    self.actor_vm.alloc_t_core(core_num)
+
+                elif target == "vq":
+                    self.actor_vm.alloc_vq_core(core_num)
 
         return

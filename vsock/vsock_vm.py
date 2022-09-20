@@ -38,11 +38,26 @@ class VSockVM(VSock):
         super()._end_tx()
         super()._end_rx()
 
+    def set_e(self,start_e,end_e):
+        self.start_e = start_e
+        self.end_e = end_e
     
     def _cb_rx(self,buf):
         #trans
         types, target, core_num, util = Parser.transPktToData(buf)
 
-        #alloc core
-        self.actor_vm.alloc(target,core_num)
+        #act
+        if types == "act":
+            if target == "start":
+                self.start_e.set()
+
+            elif target == "end":
+                self.end_e.set()
+
+            elif target == "t":
+                self.actor_vm.alloc_t_core(core_num)
+
+            elif target == "vq":
+                self.actor_vm.alloc_vq_core(core_num)
+
         return

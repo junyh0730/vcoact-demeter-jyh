@@ -1,6 +1,7 @@
 import time
 from monitor.vm.task_monitor_vm import TaskMonitorVM
 from monitor.vm.vq_monitor_vm import VQMonitorVM 
+import threading
 
 class MonitorVM():
     def __init__(self,env):
@@ -11,6 +12,9 @@ class MonitorVM():
 
         self.tm_vm = TaskMonitorVM(env)
         self.vqm_vm = VQMonitorVM(env)
+
+        self.start_e = threading.Event()
+        self.end_e = threading.Event()
 
         return
     
@@ -35,3 +39,7 @@ class MonitorVM():
 
         rst = [tm_vm_rst, vqm_vm_rst]
         return rst
+    
+    def get_e(self):
+        return self.start_e, self.end_d
+    

@@ -24,6 +24,14 @@ class Monitor():
         self.cpum.start()
         if self.env.mode == 'monitor':
             self.__send_start_sig()
+        
+            #clear file
+            f = open("./monitor.log", "a") # Create a blank file
+            f.seek(0)  # sets  point at the beginning of the file
+            f.truncate()  # Clear previous content
+            f.close() # Close file
+
+
         return
     
     def end(self):

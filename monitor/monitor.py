@@ -55,13 +55,13 @@ class Monitor():
     
     def __send_start_sig(self):
         #TODO
-        strings = "info " + "start " + "-1 " + "-1 "
+        strings = "act " + "start " + "-1 " + "-1 "
         pkt = strings.encode('utf-8')
         self.vsock.send(pkt)
 
     def __send_end_sig(self):
         #TODO
-        strings = "info " + "end " + "-1 " + "-1 "
+        strings = "act " + "end " + "-1 " + "-1 "
         pkt = strings.encode('utf-8')
         self.vsock.send(pkt)
     

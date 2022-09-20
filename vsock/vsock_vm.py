@@ -4,7 +4,7 @@ from actor.actor_vm import ActorVM
 import socket
 
 class VSockVM(VSock):
-    def __init__(self, actor_vm, env):
+    def __init__(self, actor_vm, env, start_e=None,end_e=None):
         super().__init__()
 
         self.env = env
@@ -17,6 +17,9 @@ class VSockVM(VSock):
 
         self.actor_vm = actor_vm
         self.rx_data = bytearray()
+
+        self.start_e = start_e
+        self.end_e = end_e
 
     
     def start(self):

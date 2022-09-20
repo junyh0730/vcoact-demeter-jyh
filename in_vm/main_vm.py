@@ -1,4 +1,5 @@
 import sys
+import threading
 import time
 sys.path.append("/home/vm/vcoact")
 
@@ -9,11 +10,13 @@ from vsock.parser import Parser
 from actor.actor_vm import ActorVM
 
 env = Environment()
+start_e = threading.Event()
+end_e = threading.Event()
 
 def run():
-    global env
+    global env,start_e,end_e
     actor = ActorVM(env)
-    vsock_vm_daemon = VSockVM(actor,env)
+    vsock_vm_daemon = VSockVM(actor,env,start_e,end_e)
     vsock_vm_daemon.start()
         
     main_loop(vsock_vm_daemon, actor)
@@ -22,8 +25,8 @@ def run():
 
 
 def main_loop(vsock_vm_daemon, actor):
-    global env
-    monitor_vm = MonitorVM(env)
+    global env,start_e,end_e
+    monitor_vm = MonitorVM(env,start_e,end_e)
 
     if env.mode == 'vcoact':
         while True:

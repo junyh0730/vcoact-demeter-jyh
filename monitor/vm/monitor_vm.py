@@ -4,7 +4,7 @@ from monitor.vm.vq_monitor_vm import VQMonitorVM
 import threading
 
 class MonitorVM():
-    def __init__(self,env):
+    def __init__(self,env,start_e=None,end_e=None):
         self.env = env
 
         self.start_time = -1
@@ -13,8 +13,8 @@ class MonitorVM():
         self.tm_vm = TaskMonitorVM(env)
         self.vqm_vm = VQMonitorVM(env)
 
-        self.start_e = threading.Event()
-        self.end_e = threading.Event()
+        self.start_e = start_e
+        self.end_e = end_e
 
         return
     

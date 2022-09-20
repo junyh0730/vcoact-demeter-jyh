@@ -65,9 +65,7 @@ def run():
                 if env.debug:
                     print("end monitor")
                 monitor.end()
-                break
-        
-        monitor.get()
+                monitor.get()
         
     return
 

@@ -45,21 +45,25 @@ def main_loop(vsock_vm_daemon, actor):
         start_e, end_e = monitor_vm.get_e()
         vsock_vm_daemon.set_e(start_e,end_e)
 
-        #wait start signal from hyp
-        start_e.wait()
+        while True:
+            #wait start signal from hyp
+            print("wait start event")
+            start_e.wait()
 
-        #start 
-        monitor_vm.start()
+            #start 
+            monitor_vm.start()
 
-        #wait end signal from hyp
-        end_e.wait()
+            #wait end signal from hyp
+            print("wait end event")
+            end_e.wait()
 
-        #end
-        monitor_vm.end()
-        
-        #send info
-        rst = monitor_vm.get()
-        sendInfo(vsock_vm_daemon, rst)
+            #end
+            monitor_vm.end()
+            
+            #send info
+            rst = monitor_vm.get()
+            sendInfo(vsock_vm_daemon, rst)
+            print("send info")
 
     return
 

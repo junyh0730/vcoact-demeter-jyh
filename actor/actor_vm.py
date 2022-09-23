@@ -9,9 +9,6 @@ class ActorVM():
         x=(1<<self.env.max_core) - 1
         self.HEX_CPUMASK_ALL = f'{x:x}'.encode('utf-8') 
 
-        self.cur_t_core = {'start':0, 'end':int(env.max_core - 1)}
-        self.cur_vq_core = {'start':0, 'end':int(env.max_core/2 - 1)}
-
         self.l_fd_xps = list()
         self.ll_fd_irq_aff = list()
         self.ll_fd_irq_aff_list = list()
@@ -88,8 +85,8 @@ class ActorVM():
 
     
     def __init_actor(self):
-        self.alloc_t_core(self.cur_t_core)
-        self.alloc_vq_core(self.cur_vq_core)
+        self.alloc_t_core(self.env.cur_t_core)
+        self.alloc_vq_core(self.env.cur_vq_core)
         return
     
     def alloc_t_core(self,target):
@@ -118,9 +115,7 @@ class ActorVM():
                     aff = 1
                     core = 0
 
-
                 if self.env.debug:
-
                     try:
                         print("IRQ ","cpuid: ", cpu_id," aff_list: ",os.read(fd_irq_aff_list,100).decode('utf-8'))
                         print("IRQ ","cpuid: ", cpu_id," aff: ",os.read(fd_irq_aff,100).decode('utf-8'))

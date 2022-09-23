@@ -10,12 +10,9 @@ class ActorHyp():
         x=format((int(x,2)),'x')
         self.HEX_CPUMASK_ALL = x.rjust(4,'0').encode() 
 
-        self.cur_vm_core = {'start':int(env.max_core/2), 'end':int(env.max_core - 1)}
-        self.cur_vhost_core = {'start':0, 'end':int(env.max_core/2 - 1)}
-        self.cur_hq_core = {'start':0, 'end':int(env.max_core/2 - 1)}
-
         self.l_fd_xps = list()
         self.cset_ctrl = None
+        self.vsock = None
 
         self.__open_fd_xps()
         self.__init_cset_ctrl()
@@ -23,18 +20,25 @@ class ActorHyp():
 
 
         return
+
     
     def act(self,action):
+        [vhost_core,hq_core,vq_core,vm_core,t_core] = action
+        self.__alloc_vhost_core(vhost_core)
+        self.__alloc_hq_core(hq_core)
+        self.__alloc_vq_core(vq_core)
+        self.__alloc_vm_core(vm_core)
+        self.__alloc_t_core(t_core)
         return
     
     def __init_actor(self):
-        self.alloc_vm_core(self.cur_vm_core)
-        self.alloc_vhost_core(self.cur_vhost_core)
-        self.alloc_hq_core(self.cur_hq_core)
+        self.__alloc_vm_core(self.env.cur_vm_core)
+        self.__alloc_vhost_core(self.env.cur_vhost_core)
+        self.__alloc_hq_core(self.env.cur_hq_core)
         return
 
     
-    def alloc_vm_core(self,target):
+    def __alloc_vm_core(self,target):
         for cpu in range(self.env.max_core):
             cmd = "virsh vcpupin " + self.env.vm_name + " " + \
                 str(cpu) + " " + str(target['start']) + \
@@ -42,11 +46,49 @@ class ActorHyp():
             subprocess.Popen(cmd, shell=True)
 
             print(cmd)
+        self.env.cur_vm_core = target
         return
     
-    def alloc_vhost_core(self,target):
+    def __alloc_vhost_core(self,target):
         self.cset_ctrl.cpus = range(target['start'],target['end'] + 1)
 
+        self.env.cur_vhost_core = target
+
+        return
+    
+    def __alloc_vq_core(self,target):
+        alloc_str = "act vq " + str(target['start']) + " " + str(target['end'])
+
+        pkt = alloc_str.encode('utf-8')
+        self.vsock.send(pkt)
+
+        self.env.cur_vq_core = target
+        return
+    
+    def __alloc_t_core(self,target):
+        alloc_str = "act t " + str(target['start']) + " " + str(target['end'])
+
+        pkt = alloc_str.encode('utf-8')
+        self.vsock.send(pkt)
+
+        self.env.cur_t_core = target
+        return
+
+    def __alloc_hq_core(self, target):
+        num = int(target['end'] - target['start'] + 1)
+
+        #rss
+        ethtool_str = "ethtool -X " + \
+            str(self.env.netinf_name) + " equal " + str(num)
+        subprocess.Popen(ethtool_str, shell=True)
+
+        #xps
+        for i, fd in enumerate(self.l_fd_xps):
+            if i < num:
+                os.write(fd, self.HEX_CPUMASK_ALL)
+            else:
+                os.write(fd, '00'.encode())
+        self.env.cur_hq_core = target
         return
     
     def __open_fd_xps(self):
@@ -72,7 +114,7 @@ class ActorHyp():
 
         self.cset_ctrl = cset_vhost.controller
 
-        grep_cmd="ps -eLF | grep \"vhost-\" |awk '{print $4}'"
+        grep_cmd="ps -eLF | grep \"vhost-\"[0-9] |awk '{print $4}'"
         vhost_tids = subprocess.check_output(grep_cmd,shell=True)
         vhost_tids = vhost_tids.decode('utf-8').split()
 
@@ -84,19 +126,8 @@ class ActorHyp():
 
         return
     
-    def alloc_hq_core(self, target):
-        num = int(target['end'] - target['start'] + 1)
-
-        #rss
-        ethtool_str = "ethtool -X " + \
-            str(self.env.netinf_name) + " equal " + str(num)
-        subprocess.Popen(ethtool_str, shell=True)
-
-        #xps
-        for i, fd in enumerate(self.l_fd_xps):
-            if i < num:
-                os.write(fd, self.HEX_CPUMASK_ALL)
-            else:
-                os.write(fd, '00'.encode())
-        return
+    def set_vsock(self,vsock):
+        self.vsock = vsock
+        return None
+    
     

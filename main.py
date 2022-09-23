@@ -20,6 +20,7 @@ def run():
 
     vsock_hyp.start()
     monitor.set_vsock(vsock_hyp)
+    actor_hyp.set_vsock(vsock_hyp)
 
     itr = 0
 

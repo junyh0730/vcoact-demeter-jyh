@@ -16,3 +16,12 @@ class Environment():
         self.hqm_ebpf_path = "monitor/hqm_ebpf.c"
 
         self.vsock_enable = True
+
+        self.cur_vm_core = {'start':int(self.max_core/2), 'end':int(self.max_core - 1)}
+        self.cur_vhost_core = {'start':0, 'end':int(self.max_core/2 - 1)}
+        self.cur_hq_core = {'start':0, 'end':int(self.max_core/2 - 1)}
+        self.cur_t_core = {'start':0, 'end':int(self.max_core - 1)}
+        self.cur_vq_core = {'start':0, 'end':int(self.max_core/2 - 1)}
+
+
+

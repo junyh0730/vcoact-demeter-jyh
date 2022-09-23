@@ -20,11 +20,10 @@ class Monitor():
     def start(self):
         self.start_time = time.time()
         #start record
+        self.__send_start_sig()
         self.hqm.start()
         self.cpum.start()
         if self.env.mode == 'monitor':
-            self.__send_start_sig()
-        
             #clear file
             f = open("./monitor.log", "a") # Create a blank file
             f.seek(0)  # sets  point at the beginning of the file
@@ -36,10 +35,9 @@ class Monitor():
     
     def end(self):
         #end record
+        self.__send_end_sig()
         self.hqm.end()
         self.cpum.end()
-        if self.env.mode == 'monitor':
-            self.__send_end_sig()
         self.end_time = time.time()
         return
     
@@ -48,6 +46,9 @@ class Monitor():
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
         hqm_rst = self.hqm.get(diff_time)
         cpum_rst = self.cpum.get(diff_time)
+
+        #TODO
+        #get info for vq and t
         
         rst = [hqm_rst, cpum_rst]
 
@@ -73,7 +74,11 @@ class Monitor():
         pkt = strings.encode('utf-8')
         self.vsock.send(pkt)
     
+    
     def set_info(self,target,core_num,util):
+        #TODO
+        #recode info to monitor 
+
         if self.env.debug:
             strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
             self.logger.info(strings)

@@ -55,8 +55,7 @@ class VSockVM(VSock):
 
 
         #act
-
-        for types, target, core_num, util in res:
+        for types, target, arg0, arg1 in res:
             if types == "act":
                 if target == "start":
                     self.start_e.set()
@@ -65,9 +64,11 @@ class VSockVM(VSock):
                     self.end_e.set()
 
                 elif target == "t":
+                    core_num = {'start':int(arg0), 'end':int(arg1)}
                     self.actor_vm.alloc_t_core(core_num)
 
                 elif target == "vq":
+                    core_num = {'start':int(arg0), 'end':int(arg1)}
                     self.actor_vm.alloc_vq_core(core_num)
 
         return

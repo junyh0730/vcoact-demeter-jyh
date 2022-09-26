@@ -2,6 +2,7 @@ from vsock.vsock import VSock
 from vsock.parser import Parser
 from actor.actor_vm import ActorVM
 import socket
+import threading
 
 class VSockVM(VSock):
     def __init__(self, actor_vm, env, start_e=None,end_e=None):
@@ -65,10 +66,15 @@ class VSockVM(VSock):
 
                 elif target == "t":
                     core_num = {'start':int(arg0), 'end':int(arg1)}
-                    self.actor_vm.alloc_t_core(core_num)
+                    #self.actor_vm.alloc_t_core(core_num)
+                    t = threading.Thread(target=self.actor_vm.alloc_t_core, args=(core_num,))
+                    t.start()
 
                 elif target == "vq":
                     core_num = {'start':int(arg0), 'end':int(arg1)}
-                    self.actor_vm.alloc_vq_core(core_num)
+                    #self.actor_vm.alloc_vq_core(core_num)
+                    t = threading.Thread(target=self.actor_vm.alloc_vq_core, args=(core_num,))
+                    t.start()
+
 
         return

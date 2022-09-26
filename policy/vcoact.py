@@ -32,21 +32,21 @@ class Vcoact():
         [hqm_rst, cpum_rst] = rst
 
         #comp threshold
-        with cpum_rst[self.env.cur_vm_core['start']:self.env.cur_vm_core['end']] as util:
-            vm_util = 100 * sum(util) / len(util)
-            vm_util_if_dec = 100 * sum(util) / (len(util) - 1)
-            if vm_util > self.vcpu_th:
-                state_vm = State.INC
-            elif vm_util_if_dec < self.vcpu_th * (1-self.margin):
-                state_vm = State.DEC
+        util = cpum_rst[self.env.cur_vm_core['start']:self.env.cur_vm_core['end']] 
+        vm_util = 100 * sum(util) / len(util)
+        vm_util_if_dec = 100 * sum(util) / (len(util) - 1)
+        if vm_util > self.vcpu_th:
+            state_vm = State.INC
+        elif vm_util_if_dec < self.vcpu_th * (1-self.margin):
+            state_vm = State.DEC
         
-        with cpum_rst[self.env.cur_hq_core['start']:self.env.cur_hq_core['end']] as util:
-            pkt_util = 100 * sum(util) / len(util)
-            pkt_util_if_dec = 100 * sum(util) / (len(util) - 1)
-            if pkt_util > self.pkt_th:
-                state_pkt = State.INC
-            elif pkt_util_if_dec < self.pkt_th * (1-self.margin):
-                state_pkt = State.DEC
+        util =  cpum_rst[self.env.cur_hq_core['start']:self.env.cur_hq_core['end']]
+        pkt_util = 100 * sum(util) / len(util)
+        pkt_util_if_dec = 100 * sum(util) / (len(util) - 1)
+        if pkt_util > self.pkt_th:
+            state_pkt = State.INC
+        elif pkt_util_if_dec < self.pkt_th * (1-self.margin):
+            state_pkt = State.DEC
         
         #decide action
         #decide vcpu 
@@ -70,6 +70,10 @@ class Vcoact():
                 vhost_core['end'] -= 1
         
         action = [vhost_core,hq_core,vq_core,vm_core,t_core]
+
+        if self.env.debug:
+            print("vhost: ", vhost_core, "hq_core: ", hq_core, "vq_core: ",
+                  vq_core, 'vm_core: ', vm_core, 't_core: ', t_core)
 
         return action
         

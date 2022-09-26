@@ -128,6 +128,9 @@ class ActorHyp():
     
     def set_vsock(self,vsock):
         self.vsock = vsock
+        self.__alloc_vq_core(self.env.cur_vq_core)
+        self.__alloc_t_core(self.env.cur_t_core)
+
         return None
     
     

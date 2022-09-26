@@ -18,19 +18,14 @@ class Parser():
             try: 
                 types = a_s[0]
                 target = a_s[1]
-                core_num = a_s[2]
-                util = a_s[3]
+                arg0 = a_s[2]
+                arg1 = a_s[3]
             except:
                 remainder.extend(s.encode('utf-8'))
                 break
 
-            if types == 'act':
-                #|Type|Target|core_num|
-                res_strings.append([types, target, core_num, -1])
+            res_strings.append([types, target, arg0, arg1])
                 
-            elif types == 'info':
-                #|Type|Target|core_num|util|
-                res_strings.append([types, target, core_num, util])
             
         return res_strings, remainder
 

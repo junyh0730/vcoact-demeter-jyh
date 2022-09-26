@@ -51,8 +51,11 @@ class Monitor():
         #get info for vq and t
         
         rst = [hqm_rst, cpum_rst]
-
+        
         if self.env.debug:
+            print("monitor diff_time: ",diff_time)
+
+        if self.env.mode == 'monitor':
             self.logger.info("info diff_time " + str(diff_time / 1000/ 1000/ 1000) + ' s')
             m_str=["hq", 'pcpu']
             for target, l_r in zip(m_str, rst):

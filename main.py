@@ -27,13 +27,18 @@ def run():
     # main loop
     if env.mode == 'vcoact':
         while True:
+            #monitor
             monitor.start()
             time.sleep(env.period)
             monitor.end()
 
+            #get monitor result
             result = monitor.get()
 
+            #policy
             action = agent.step(result)
+
+            #act
             actor_hyp.act(action)
 
             itr += 1

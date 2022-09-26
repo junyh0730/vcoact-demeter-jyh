@@ -17,11 +17,32 @@ class Environment():
 
         self.vsock_enable = True
 
-        self.cur_vm_core = {'start':int(self.max_core/2), 'end':int(self.max_core - 1)}
-        self.cur_vhost_core = {'start':0, 'end':int((self.max_core/2) - 1)}
-        self.cur_hq_core = {'start':0, 'end':int((self.max_core/2) - 1)}
-        self.cur_t_core = {'start':0, 'end':int((self.max_core/2) - 1)}
-        self.cur_vq_core = {'start':0, 'end':int((self.max_core/2) - 1)}
+        half_core = self.max_core/2
+
+        self.cur_vm_core = {'start':int(half_core), 'end':int(self.max_core - 1)}
+        self.cur_vhost_core = {'start':0, 'end':int(half_core - 1)}
+        self.cur_hq_core = {'start':0, 'end':int(half_core - 1)}
+        self.cur_t_core = {'start':0, 'end':int(half_core - 1)}
+        self.cur_vq_core = {'start':0, 'end':int(half_core - 1)}
+    
+    def get_cur_core(self):
+        vhost_core = self.cur_vhost_core.copy()
+        hq_core = self.cur_hq_core.copy()
+        vq_core = self.cur_vq_core.copy()
+        vm_core =  self.cur_vm_core.copy()
+        t_core = self.cur_t_core.copy()
+
+        cur_core = [vhost_core,hq_core,vq_core,vm_core,t_core]
+        return cur_core
+    
+    def set_cur_core(self,cur_core):
+        [vhost_core,hq_core,vq_core,vm_core,t_core] = cur_core
+        self.cur_vhost_core = vhost_core  
+        self.cur_hq_core = hq_core 
+        self.cur_vq_core = vq_core 
+        self.cur_vm_core = vm_core 
+        self.cur_t_core  = t_core 
+
 
 
 

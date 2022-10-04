@@ -35,13 +35,13 @@ def main_loop(vsock_vm_daemon, actor):
             monitor_vm.end()
 
             #monitor
-            rst = monitor_vm.get()
+            #rst = monitor_vm.get()
             
             #send info
-            sendInfo(vsock_vm_daemon, rst)
+            #sendInfo(vsock_vm_daemon, rst)
 
             #alloc core 
-            t_core, vq_core = alloc_policy(actor,rst)
+            #t_core, vq_core = alloc_policy(actor,rst)
 
     elif env.mode == 'monitor':
         #init

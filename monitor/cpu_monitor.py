@@ -22,7 +22,7 @@ class CPUMonitor():
         #start record
         #self.start_usage_percpu = self.ctrl.usage_percpu
         self.l_start_idle, self.l_start_non_idle = self.__read_stat()
-        return
+        return 
     
     def end(self):
         #end record
@@ -50,6 +50,10 @@ class CPUMonitor():
             result.append(pctg)
 
         return result
+    
+    def get_raw(self):
+        self.l_start_idle, self.l_start_non_idle = self.__read_stat()
+        return self.l_start_idle, self.l_start_non_idle
     
     def __read_stat(self):
         l_idle = list()

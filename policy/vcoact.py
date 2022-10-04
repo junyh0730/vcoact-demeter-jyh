@@ -10,8 +10,13 @@ class State(Enum):
 class Vcoact():
     def __init__(self, env):
         self.env = env
-        self.pkt_th = 90
+        #memcached
+        #self.pkt_th = 90
+        #self.vcpu_th = 85
+        #nginx
+        self.pkt_th = 70
         self.vcpu_th = 85
+
         self.margin = 0.1
         return
     

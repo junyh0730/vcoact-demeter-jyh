@@ -32,3 +32,4 @@ monitor/vm/__pycache__/monitor_vm.cpython-38.pyc
 monitor/vm/__pycache__/task_monitor_vm.cpython-38.pyc
 monitor/vm/__pycache__/vq_monitor_vm.cpython-38.pyc
 monitor.log
+tracer/__pycache__/tracer.cpython-38.pyc

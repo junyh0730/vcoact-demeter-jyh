@@ -33,6 +33,9 @@ class HQMonitor():
 
         return rst
     
+    def get_raw(self):
+        return self.read_softirq_usage()
+    
     def read_softirq_usage(self):
         l_softirq_usage = [0.0] * self.env.max_core
         dist = self.dist_irq

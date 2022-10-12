@@ -9,16 +9,16 @@ class Environment():
         self.server_ip = "10.150.21.215"
         self.vm_name = "ubuntu18.04"
 
-        self.debug = True
+        self.debug = False
         #self.mode = "monitor" 
         self.mode = "vcoact" 
         self.is_tracer = True
-        self.period = 0.1 #s
+        self.period = 0.01 #s
         self.hqm_ebpf_path = "monitor/hqm_ebpf.c"
 
         self.vsock_enable = True
 
-        half_core = self.max_core/2
+        half_core = int(self.max_core/2)
 
         self.cur_vm_core = {'start':int(half_core), 'end':int(self.max_core - 1)}
         self.cur_vhost_core = {'start':0, 'end':int(half_core - 1)}

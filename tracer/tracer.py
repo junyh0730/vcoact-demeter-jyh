@@ -2,6 +2,7 @@ import socket
 import threading
 import multiprocessing
 import logging
+import numpy as np
 
 class Tracer():
     def __init__(self,env,monitor):
@@ -37,7 +38,6 @@ class Tracer():
         if action == None:
             action = self.env.get_cur_core()
 
-        print('itr: %d',self.itr)
         self.itr += 1
         self.l_rst.append(rst)
         self.l_action.append(action)
@@ -112,11 +112,15 @@ class Tracer():
             accu[1] += pkt_core_num
 
             #accu util
-            [hqm_rst, cpum_rst] = rst
-            vm_raw_util = cpum_rst[vm_core['start']:vm_core['end']+1]
-            vm_util =  sum(vm_raw_util) / len(vm_raw_util)
-            pkt_raw_util =  cpum_rst[hq_core['start']:hq_core['end'] + 1]
-            pkt_util =  sum(pkt_raw_util) / len(pkt_raw_util)
+            #[hqm_rst, cpum_rst] = rst
+            cur_vm_core = self.env.cur_vm_core['start']
+            cur_hq_core = self.env.cur_hq_core['end'] + 1
+
+            arr_vm = np.split(rst, [cur_vm_core])[1]
+            arr_pkt = np.split(rst, [cur_hq_core])[0]
+
+            vm_util = np.average(arr_vm)
+            pkt_util = np.average(arr_pkt)
 
             accu[2] += vm_util
             accu[3] += pkt_util
@@ -128,7 +132,9 @@ class Tracer():
         avg_pkt_util = round(accu[3] / self.itr,2)
 
         #cal engy
+        MAX_LIMIT_ENGY_VAL = 4294967296
         engy = self.end_engy - self.start_engy
+        engy = (engy + MAX_LIMIT_ENGY_VAL) % MAX_LIMIT_ENGY_VAL
 
         stat = [avg_vm_num, avg_pkt_num, avg_vm_util, avg_pkt_util, engy]
 

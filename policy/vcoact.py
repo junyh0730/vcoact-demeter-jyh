@@ -1,5 +1,34 @@
 from enum import Enum, auto
 from pickle import MEMOIZE
+import numpy as np
+from numba import jit
+import time
+
+
+@jit(nopython=True, cache=True)
+def cal_util(rst, cur_vm_core, cur_hq_core):
+    vm_util = float(-1)
+    vm_util_if_dec = float(-1)
+    pkt_util = float(-1)
+    pkt_util_if_dec = float(-1)
+
+    arr_vm = np.split(rst, [cur_vm_core])[1]
+    arr_pkt = np.split(rst, [cur_hq_core])[0]
+
+    vm_util = np.average(arr_vm)
+    pkt_util = np.average(arr_pkt)
+
+    if len(arr_vm) != 1:
+        vm_util_if_dec = np.sum(arr_vm)/(len(arr_vm) - 1)
+    if len(arr_pkt) != 1:
+        pkt_util_if_dec = np.sum(arr_pkt)/(len(arr_pkt) - 1)
+
+    #print('vm_util:',vm_util,'pkt_util:',pkt_util)
+    #print('vm_util_if:',vm_util_if_dec,'pkt_util_if:',pkt_util_if_dec)
+
+    return vm_util, vm_util_if_dec, pkt_util, pkt_util_if_dec
+
+
 
 class State(Enum):
     INC = auto()
@@ -10,16 +39,14 @@ class State(Enum):
 class Vcoact():
     def __init__(self, env):
         self.env = env
-        #memcached
-        #self.pkt_th = 90
-        #self.vcpu_th = 85
-        #nginx
-        self.pkt_th = 70
-        self.vcpu_th = 85
+
+        self.pkt_th = 80
+        self.vcpu_th = 70
 
         self.margin = 0.1
         return
     
+       
     def step(self,rst):
         #init
         action = None
@@ -30,29 +57,31 @@ class Vcoact():
         state_pkt = State.STAY
 
         #get monitor
-        [hqm_rst, cpum_rst] = rst
+        #[hqm_rst, cpum_rst] = rst
+
 
         #cal util
-        vm_raw_util = cpum_rst[self.env.cur_vm_core['start']:self.env.cur_vm_core['end'] + 1] 
-        vm_util =  sum(vm_raw_util) / len(vm_raw_util)
-        pkt_raw_util =  cpum_rst[self.env.cur_hq_core['start']:self.env.cur_hq_core['end'] + 1]
-        pkt_util =  sum(pkt_raw_util) / len(pkt_raw_util)
+        cur_vm_core = self.env.cur_vm_core['start']
+        cur_hq_core = self.env.cur_hq_core['end'] + 1
+        vm_util, vm_util_if_dec, pkt_util, pkt_util_if_dec = cal_util(
+            rst,cur_vm_core,cur_hq_core)
+            
 
-        print('vm_util:',vm_util,'pkt_util:',pkt_util)
+        if vm_util < 0 or pkt_util <0:
+            return [vhost_core,hq_core,vq_core,vm_core,t_core] 
+
+        if self.env.debug:
+            print('vm_util:',vm_util,'pkt_util:',pkt_util)
 
         #comp threshold
         #for vm
-        if len(vm_raw_util) > 1:
-            vm_util_if_dec = sum(vm_raw_util) / (len(vm_raw_util) - 1)
-            if vm_util_if_dec < self.vcpu_th * (1-self.margin):
+        if vm_util_if_dec < self.vcpu_th * (1-self.margin):
                 state_vcpu = State.DEC
         if vm_util > self.vcpu_th:
             state_vcpu = State.INC
                 
         #for pkt
-        if len(pkt_raw_util) > 1:
-            pkt_util_if_dec = sum(pkt_raw_util) / (len(pkt_raw_util) - 1)
-            if pkt_util_if_dec < self.pkt_th * (1-self.margin):
+        if pkt_util_if_dec < self.pkt_th * (1-self.margin):
                 state_pkt = State.DEC
         if pkt_util > self.pkt_th:
             state_pkt = State.INC
@@ -82,8 +111,10 @@ class Vcoact():
        
         action = [vhost_core,hq_core,vq_core,vm_core,t_core]
 
+
+
         if self.env.debug:
-            print('util: ',cpum_rst)
+            print('util: ',rst)
             print('state_vcpu:',state_vcpu, 'state_pkt:',state_pkt)
             print("vhost: ", vhost_core, "hq_core: ", hq_core, "vq_core: ",
                   vq_core, 'vm_core: ', vm_core, 't_core: ', t_core)

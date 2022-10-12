@@ -18,16 +18,16 @@ class Monitor():
         self.start_time = time.time()
 
         #start record
-        self.__send_start_sig()
-        self.hqm.start()
+        #self.__send_start_sig()
+        #self.hqm.start()
         self.cpum.start()
         return
 
     
     def end(self):
         #end record
-        self.__send_end_sig()
-        self.hqm.end()
+        #self.__send_end_sig()
+        #self.hqm.end()
         self.cpum.end()
         self.end_time = time.time()
         return
@@ -35,10 +35,10 @@ class Monitor():
     def get(self):
         rst = None
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
-        hqm_rst = self.hqm.get(diff_time)
+        #hqm_rst = self.hqm.get(diff_time)
         cpum_rst = self.cpum.get(diff_time)
 
-        rst = [hqm_rst, cpum_rst]
+        #rst = [hqm_rst, cpum_rst]
         
         if self.env.debug:
             print("monitor diff_time: ",diff_time)
@@ -53,7 +53,7 @@ class Monitor():
                     self.logger.info(strings)
         """
 
-        return rst
+        return cpum_rst
     
     def __get_raw(self):
         cur_time = time.time()
@@ -93,12 +93,12 @@ class Monitor():
     """
     
     def __send_start_sig(self):
-        strings = "act " + "start " + "-1 " + "-1 "
+        strings = "".join(["act ", "start ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
         self.vsock.send(pkt)
 
     def __send_end_sig(self):
-        strings = "act " + "end " + "-1 " + "-1 "
+        strings = "".join(["act ", "end ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
         self.vsock.send(pkt)
     

@@ -36,10 +36,14 @@ def run():
         print('start monitor mode')
 
 
+    start_time = time.time()
     while True:
         #monitor
         monitor.start()
+        end_time = time.time()
+        print('total time: ',(end_time - start_time) * 1000 * 1000, "us")
         time.sleep(env.period)
+        start_time = time.time()
         monitor.end()
 
         #get monitor result
@@ -51,14 +55,15 @@ def run():
 
             #act
             actor_hyp.act(action)
-
+            
         #tracer
         if env.is_tracer:
             tracer.trace(result, action)
 
         itr += 1
+
            
-    return
+    return None
 
 
 if __name__ == "__main__":

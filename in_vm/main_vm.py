@@ -30,9 +30,10 @@ def main_loop(vsock_vm_daemon, actor):
 
     if env.mode == 'vcoact':
         while True:
-            monitor_vm.start()
-            time.sleep(env.period)
-            monitor_vm.end()
+            None
+            #monitor_vm.start()
+            #time.sleep(env.period)
+            #monitor_vm.end()
 
             #monitor
             #rst = monitor_vm.get()

@@ -85,14 +85,14 @@ class ActorHyp():
         return
     
     def __alloc_vq_core(self,target):
-        alloc_str = "act vq " + str(target['start']) + " " + str(target['end']) + " \n"
+        alloc_str = "".join(["act vq " , str(target['start']) , " " , str(target['end']) , " \n"])
 
         pkt = alloc_str.encode('utf-8')
         self.vsock.send(pkt)
         return
     
     def __alloc_t_core(self,target):
-        alloc_str = "act t " + str(target['start']) + " " + str(target['end']) + " \n"
+        alloc_str = "".join(["act t " , str(target['start']) , " " , str(target['end']) , " \n"])
 
         pkt = alloc_str.encode('utf-8')
         self.vsock.send(pkt)

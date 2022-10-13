@@ -41,24 +41,25 @@ def run():
         #monitor
         monitor.start()
         end_time = time.time()
-        print('total time: ',(end_time - start_time) * 1000 * 1000, "us")
+        if env.debug:
+            print('total time: ',(end_time - start_time) * 1000 * 1000, "us")
         time.sleep(env.period)
         start_time = time.time()
         monitor.end()
 
         #get monitor result
-        result = monitor.get()
+        m_rst,p99 = monitor.get()
 
         if env.mode == 'vcoact':
             #policy
-            action = agent.step(result)
+            action = agent.step(m_rst)
 
             #act
             actor_hyp.act(action)
             
         #tracer
         if env.is_tracer:
-            tracer.trace(result, action)
+            tracer.trace(m_rst, action)
 
         itr += 1
 

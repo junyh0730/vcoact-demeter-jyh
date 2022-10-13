@@ -2,6 +2,7 @@ import time
 import os, struct
 from monitor.hq_monitor import HQMonitor
 from monitor.cpu_monitor import CPUMonitor
+from monitor.latency_collector import LatCollector
 
 class Monitor():
     def __init__(self,env):
@@ -10,6 +11,7 @@ class Monitor():
         self.end_time = -1
         self.hqm = HQMonitor(env)
         self.cpum = CPUMonitor(env)
+        self.latency_collector = LatCollector(env)
         self.vsock = None
         return
     
@@ -37,6 +39,7 @@ class Monitor():
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
         #hqm_rst = self.hqm.get(diff_time)
         cpum_rst = self.cpum.get(diff_time)
+        p99 = self.latency_collector.getCurLatency()
 
         #rst = [hqm_rst, cpum_rst]
         
@@ -53,7 +56,7 @@ class Monitor():
                     self.logger.info(strings)
         """
 
-        return cpum_rst
+        return cpum_rst,p99
     
     def __get_raw(self):
         cur_time = time.time()

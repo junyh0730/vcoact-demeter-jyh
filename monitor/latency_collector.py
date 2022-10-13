@@ -4,8 +4,11 @@ import socket
 
 class LatCollector():
     def __init__(self, env):
+        self.env = env
+        self.slo = env.slo
         self.server_port = 9999 
-        self.latency_queue = Queue(maxsize=self.window_size)
+        window_size = 100
+        self.latency_queue = Queue(maxsize=window_size)
         self.latency_collector = Process(target=self.__latency_collect_daemon,
                                         args=(self.latency_queue,))
         self.latency_collector.deamon = True
@@ -13,16 +16,19 @@ class LatCollector():
     
     
     def getCurLatency(self):
-        latency = 0.0
-        if len(self.latency_lst) > 0:
-            latency = self.latency_lst[-1]
-        return float(latency)
+        count = 0
+        latency = 0
+        while self.latency_queue.qsize():
+            latency += self.latency_queue.get()
+            count += 1
 
-    def updateLatency(self, latency):
-        self.latency_lst.append(latency)
-        if len(self.latency_lst) > self.window_size:
-            self.latency_lst.pop(0)
-        return
+        if count > 0:
+            latency = latency / count
+            norm_latency = latency / self.slo
+        else:
+            norm_latency = -1
+        
+        return norm_latency
 
     def __latency_collect_daemon(self, latency_queue):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

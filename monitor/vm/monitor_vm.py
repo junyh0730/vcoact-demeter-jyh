@@ -39,8 +39,7 @@ class MonitorVM():
         #vqm_vm_rst = self.vqm_vm.get(diff_time)
 
         #rst = [tm_vm_rst, vqm_vm_rst]
-        rst = [tm_vm_rst]
-        return rst
+        return tm_vm_rst
     
     def get_e(self):
         return self.start_e, self.end_e

@@ -49,11 +49,9 @@ class VSockVM(VSock):
     
     def _cb_rx(self,buf):
         #trans
-
         self.rx_data.extend(buf)
         res, remainder = Parser.transPktToData(self.rx_data)
         self.rx_data = remainder
-
 
         #act
         for types, target, arg0, arg1 in res:

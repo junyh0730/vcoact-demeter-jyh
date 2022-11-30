@@ -76,13 +76,13 @@ def main_loop(vsock_vm_daemon, actor):
 
 
 def sendInfo(vsock_vm_daemon, rst):
-    l_rst_target = ["task"]
-    for target, util in zip(l_rst_target,rst):
-        #trans
-        pkt = Parser.transInfoToPkt(target, util)
-
-        #send
-        vsock_vm_daemon.send(pkt)
+    rst_target = "task"
+    #trans
+    pkt = Parser.transInfoToPkt(rst_target, rst)
+    print(pkt)
+    
+    #send
+    vsock_vm_daemon.send(pkt)
     
     return
     

@@ -27,6 +27,10 @@ class ActorHyp():
     
     def act(self,action):
         [vhost_core,hq_core,vq_core,vm_core,t_core] = action
+        cur_core_alloc = action
+        prev_core_alloc = [self.env.cur_vhost_core, self.env.cur_hq_core,
+                           self.env.cur_vq_core, self.env.cur_vm_core, self.env.cur_t_core]
+
         start_time = time.time()
         if self.env.cur_hq_core != hq_core:
             #self.__alloc_hq_core(hq_core)
@@ -57,7 +61,7 @@ class ActorHyp():
             print('act time: ',(end_time - start_time) * 1000 * 1000, "us")
 
         self.env.set_cur_core(action)
-        return
+        return prev_core_alloc, cur_core_alloc
     
     def __init_actor(self):
         self.__alloc_vm_core(self.env.cur_vm_core)
@@ -168,7 +172,6 @@ class ActorHyp():
                 self.cset_ctrl_vcpu.tasks = [t]
             except:
                 continue
-
 
         return
     

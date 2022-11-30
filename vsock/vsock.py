@@ -4,7 +4,7 @@ import logging
 
 class VSock():
     def __init__(self):
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
 
         self.logger = logging.getLogger("vsock_hyp")
         self.user = ""
@@ -50,12 +50,12 @@ class VSock():
             (conn, (remote_cid, remote_port)) = self.rx_sock.accept()
 
             #connection
-            self.logger.debug("Got Rx connection")
+            self.logger.info("Got Rx connection")
             print(f"Connection opened by cid={remote_cid} port={remote_port}")
             process = multiprocessing.Process(target=self.__handle_rx, args=(conn,))
             process.daemon = True
             process.start()
-            self.logger.debug("Started process %r", process)
+            self.logger.info("Started process %r", process)
 
         except:
             logging.exception("Unexpected exception")

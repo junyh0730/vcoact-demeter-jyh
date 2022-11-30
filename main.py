@@ -6,6 +6,9 @@ from vsock.vsock_hyp import VSockHYP
 from actor.actor_hyp import ActorHyp
 from tracer.tracer import Tracer
 import time
+import logging
+numba_logger = logging.getLogger('numba')
+numba_logger.setLevel(logging.WARNING)
 
 sys.path.append("/home/caslab/vcoact")
 
@@ -35,7 +38,7 @@ def run():
     elif env.mode == 'monitor':
         print('start monitor mode')
 
-
+    cur_core_alloc = env.get_cur_core()
     start_time = time.time()
     while True:
         #monitor
@@ -50,19 +53,24 @@ def run():
         #get monitor result
         m_rst,p99 = monitor.get()
 
+        #tracer
+        if env.is_tracer:
+            t = tracer.trace(m_rst, cur_core_alloc, p99)
+
         if env.mode == 'vcoact':
             #policy
             action = agent.step(m_rst)
 
             #act
-            actor_hyp.act(action)
+            prev_core_alloc, cur_core_alloc = actor_hyp.act(action)
             
-        #tracer
-        if env.is_tracer:
-            tracer.trace(m_rst, action)
+                
+        
+        #update th
+        vm_th, pkt_th = tracer.get_th()
+        agent.set_th(vm_th,pkt_th)
 
         itr += 1
-
            
     return None
 

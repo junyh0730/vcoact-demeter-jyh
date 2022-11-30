@@ -57,9 +57,11 @@ class VSockVM(VSock):
         for types, target, arg0, arg1 in res:
             if types == "act":
                 if target == "start":
+                    print('start event set in vm')
                     self.start_e.set()
 
                 elif target == "end":
+                    print('end event set in vm')
                     self.end_e.set()
 
                 elif target == "t":

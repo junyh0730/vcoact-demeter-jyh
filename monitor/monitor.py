@@ -98,11 +98,13 @@ class Monitor():
     def __send_start_sig(self):
         strings = "".join(["act ", "start ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
+        print('send_start_sig: ',pkt)
         self.vsock.send(pkt)
 
     def __send_end_sig(self):
         strings = "".join(["act ", "end ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
+        print('send_end_sig: ',pkt)
         self.vsock.send(pkt)
     
     

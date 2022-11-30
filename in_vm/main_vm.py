@@ -49,6 +49,9 @@ def main_loop(vsock_vm_daemon, actor):
         #start_e, end_e = monitor_vm.get_e()
         #vsock_vm_daemon.set_e(start_e,end_e)
 
+        start_e.clear()
+        end_e.clear()
+
         while True:
             #wait start signal from hyp
             print("wait start event")

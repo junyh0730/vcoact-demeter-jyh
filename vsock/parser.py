@@ -31,9 +31,11 @@ class Parser():
 
     def transInfoToPkt(target, utils):
         s_info = ""
+        l_s = list()
         for core, u in enumerate(utils):
-            s_info = s_info.join(["info ",str(target)," " ,str(core)," ",str(u)," \n"])
-
+            s = ["info ",str(target)," " ,str(core)," ",str(u)," \n"]
+            l_s.extend(s)
+        s_info = s_info.join(l_s)
         s_info = s_info.encode('utf-8')
         return s_info
     

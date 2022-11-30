@@ -47,7 +47,9 @@ class TaskMonitorVM():
             non_idle_time = end_non_idle - start_non_idle
             idle_time = end_idle - start_idle
             total = non_idle_time + idle_time
-            pctg = round(non_idle_time * 100 / total, 3)
+            pctg = 0
+            if total > 0:
+                pctg = round(non_idle_time * 100 / total, 3)
             result.append(pctg)
 
         return result

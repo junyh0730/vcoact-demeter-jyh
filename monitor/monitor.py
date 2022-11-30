@@ -20,7 +20,7 @@ class Monitor():
         self.start_time = time.time()
 
         #start record
-        #self.__send_start_sig()
+        self.__send_start_sig()
         #self.hqm.start()
         self.cpum.start()
         return
@@ -28,7 +28,7 @@ class Monitor():
     
     def end(self):
         #end record
-        #self.__send_end_sig()
+        self.__send_end_sig()
         #self.hqm.end()
         self.cpum.end()
         self.end_time = time.time()
@@ -106,13 +106,13 @@ class Monitor():
         self.vsock.send(pkt)
     
     
-    """
     def set_info(self,target,core_num,util):
         if self.env.debug:
             strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
             self.logger.info(strings)
+        strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
+        print(strings)
         return
-    """
 
     def set_vsock(self,vsock):
         self.vsock = vsock

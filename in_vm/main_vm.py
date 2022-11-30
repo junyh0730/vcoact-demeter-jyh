@@ -74,16 +74,9 @@ def main_loop(vsock_vm_daemon, actor):
 
     return
 
-def alloc_policy(actor, rst):
-    t_core, vq_core = actor.cur_t_core, actor.cur_vq_core
-
-    #TODO: impl core allocation policy
-
-
-    return t_core, vq_core
 
 def sendInfo(vsock_vm_daemon, rst):
-    l_rst_target = ["task", "vq"]
+    l_rst_target = ["task"]
     for target, util in zip(l_rst_target,rst):
         #trans
         pkt = Parser.transInfoToPkt(target, util)

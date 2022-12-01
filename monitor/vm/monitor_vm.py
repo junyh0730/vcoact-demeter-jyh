@@ -33,7 +33,6 @@ class MonitorVM():
     def get(self):
         rst = None
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
-        print('diff_time: ', diff_time)
 
         tm_vm_rst = self.tm_vm.get(diff_time)
         #vqm_vm_rst = self.vqm_vm.get(diff_time)

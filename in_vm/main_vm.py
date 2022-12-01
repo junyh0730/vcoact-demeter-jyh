@@ -54,7 +54,7 @@ def main_loop(vsock_vm_daemon, actor):
 
         while True:
             #wait start signal from hyp
-            print("wait start event")
+            #print("wait start event")
             start_e.wait()
             start_e.clear()
 
@@ -62,7 +62,7 @@ def main_loop(vsock_vm_daemon, actor):
             monitor_vm.start()
 
             #wait end signal from hyp
-            print("wait end event")
+            #print("wait end event")
             end_e.wait()
             end_e.clear()
 
@@ -72,7 +72,7 @@ def main_loop(vsock_vm_daemon, actor):
             #send info
             rst = monitor_vm.get()
             sendInfo(vsock_vm_daemon, rst)
-            print("send info")
+            #print("send info")
 
 
     return
@@ -82,7 +82,7 @@ def sendInfo(vsock_vm_daemon, rst):
     rst_target = "task"
     #trans
     pkt = Parser.transInfoToPkt(rst_target, rst)
-    print(pkt)
+    #print(pkt)
     
     #send
     vsock_vm_daemon.send(pkt)

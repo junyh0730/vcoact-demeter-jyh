@@ -42,24 +42,24 @@ class TaskMonitorVM():
         self.env_usage_percpu = None
         self.fd_stat = os.open('/proc/stat',os.O_RDONLY)
 
-        self.l_start_idle = None
-        self.l_end_idle = None
-        self.l_start_non_idle = None
-        self.l_end_non_idle = None
+        self.arr_start_idle = None
+        self.arr_end_idle = None
+        self.arr_start_non_idle = None
+        self.arr_end_non_idle = None
 
         return
 
     def start(self):
         #start record
         #self.start_usage_percpu = self.ctrl.usage_percpu
-        self.l_start_idle, self.l_start_non_idle = self.__read_stat()
+        self.arr_start_idle, self.arr_start_non_idle = self.__read_stat()
         
         return
     
     def end(self):
         #end record
         #self.end_usage_percpu = self.ctrl.usage_percpu
-        self.l_end_idle, self.l_end_non_idle = self.__read_stat()
+        self.arr_end_idle, self.arr_end_non_idle = self.__read_stat()
         return
     
     def get(self,diff_time):

@@ -81,7 +81,7 @@ def main_loop(vsock_vm_daemon, actor):
 def sendInfo(vsock_vm_daemon, rst):
     rst_target = "task"
     #trans
-    pkt = Parser.transInfoToPkt(rst_target, rst)
+    pkt = Parser.transInfoToPkt(rst_target, rst.tolist())
     #print(pkt)
     
     #send

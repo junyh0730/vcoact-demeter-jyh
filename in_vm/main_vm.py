@@ -56,6 +56,7 @@ def main_loop(vsock_vm_daemon, actor):
             #wait start signal from hyp
             print("wait start event")
             start_e.wait()
+            start_e.clear()
 
             #start 
             monitor_vm.start()
@@ -63,6 +64,7 @@ def main_loop(vsock_vm_daemon, actor):
             #wait end signal from hyp
             print("wait end event")
             end_e.wait()
+            end_e.clear()
 
             #end
             monitor_vm.end()
@@ -72,8 +74,6 @@ def main_loop(vsock_vm_daemon, actor):
             sendInfo(vsock_vm_daemon, rst)
             print("send info")
 
-            start_e.clear()
-            end_e.clear()
 
     return
 

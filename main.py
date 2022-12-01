@@ -43,12 +43,14 @@ def run():
     while True:
         #monitor
         monitor.start()
+        start_time = time.time()
+        time.sleep(env.period)
         end_time = time.time()
+        monitor.end()
+
         if env.debug:
             print('total time: ',(end_time - start_time) * 1000 * 1000, "us")
-        time.sleep(env.period)
-        start_time = time.time()
-        monitor.end()
+
 
         #get monitor result
         m_rst,p99 = monitor.get()

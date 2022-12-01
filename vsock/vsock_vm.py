@@ -29,7 +29,7 @@ class VSockVM(VSock):
 
         try: 
             super()._start_tx()
-            super()._start_rx()
+            super()._start_rx(None)
 
         except:
             print("vsock: start error in vm")
@@ -47,7 +47,7 @@ class VSockVM(VSock):
         self.start_e = start_e
         self.end_e = end_e
     
-    def _cb_rx(self,buf):
+    def _cb_rx(self,buf,q):
         #trans
         self.rx_data.extend(buf)
         res, remainder = Parser.transPktToData(self.rx_data)

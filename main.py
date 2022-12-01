@@ -7,6 +7,10 @@ from actor.actor_hyp import ActorHyp
 from tracer.tracer import Tracer
 import time
 import logging
+from multiprocessing import Queue
+
+
+
 numba_logger = logging.getLogger('numba')
 numba_logger.setLevel(logging.WARNING)
 
@@ -16,9 +20,10 @@ env = Environment()
 
 def run():
     global env
-    monitor = Monitor(env)
+    q = Queue()
+    monitor = Monitor(env,q)
     actor_hyp = ActorHyp(env)
-    vsock_hyp = VSockHYP(env, monitor, actor_hyp)
+    vsock_hyp = VSockHYP(env, monitor, actor_hyp,q)
     agent = Vcoact(env)
     tracer = None
     if env.is_tracer:
@@ -53,15 +58,15 @@ def run():
 
 
         #get monitor result
-        m_rst,p99 = monitor.get()
+        rst,p99 = monitor.get()
 
         #tracer
         if env.is_tracer:
-            t = tracer.trace(m_rst, cur_core_alloc, p99)
+            t = tracer.trace(rst, cur_core_alloc, p99)
 
         if env.mode == 'vcoact':
             #policy
-            action = agent.step(m_rst)
+            action = agent.step(rst)
 
             #act
             prev_core_alloc, cur_core_alloc = actor_hyp.act(action)

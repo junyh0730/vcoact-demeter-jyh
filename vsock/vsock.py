@@ -40,7 +40,7 @@ class VSock():
         return
 
     
-    def _start_rx(self):
+    def _start_rx(self,q):
         try:
             #listen
             logging.info("Listening")
@@ -52,7 +52,7 @@ class VSock():
             #connection
             self.logger.info("Got Rx connection")
             print(f"Connection opened by cid={remote_cid} port={remote_port}")
-            process = multiprocessing.Process(target=self.__handle_rx, args=(conn,))
+            process = multiprocessing.Process(target=self.__handle_rx, args=(conn,q,))
             process.daemon = True
             process.start()
             self.logger.info("Started process %r", process)
@@ -72,16 +72,16 @@ class VSock():
 
         return 
     
-    def __handle_rx(self,conn):
+    def __handle_rx(self,conn,q):
         while True:
             buf = conn.recv(self.RX_BUF_LEN)
             if not buf:
                 break
 
-            self._cb_rx(buf)
+            self._cb_rx(buf,q)
         return
     
-    def _cb_rx(self,buf):
+    def _cb_rx(self,buf,q):
         pass
     
     def __handle_tx(self):

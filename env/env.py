@@ -14,7 +14,7 @@ class Environment():
         self.mode = "monitor" 
         #self.mode = "vcoact" 
         self.is_tracer = True
-        self.period = 1 #s
+        self.period = 0.1 #s
         self.hqm_ebpf_path = "monitor/hqm_ebpf.c"
         self.slo = 1
 

@@ -4,9 +4,10 @@ import socket
 import time
 
 class VSockHYP(VSock):
-    def __init__(self,env,monitor,actor):
+    def __init__(self,env,monitor,actor,q):
         super().__init__()
         self.env = env
+        self.q = q
         self.user = "hyp"
         self.monitor = monitor
         self.actor = actor
@@ -25,7 +26,7 @@ class VSockHYP(VSock):
             return None
 
         try: 
-            super()._start_rx()
+            super()._start_rx(self.q)
             time.sleep(3)
             super()._start_tx()
         except:
@@ -42,7 +43,7 @@ class VSockHYP(VSock):
         super()._end_tx()
 
     
-    def _cb_rx(self,buf):
+    def _cb_rx(self,buf,q):
         #trans
         self.rx_data.extend(buf)
         res, remainder = Parser.transPktToData(self.rx_data)
@@ -51,7 +52,7 @@ class VSockHYP(VSock):
         for types, target, core_num, util in res:
             #collecct info
             if types == 'info':
-                self.monitor.set_info(target, core_num, util)
+                self.monitor.set_info(target, core_num, util,q)
 
             elif types == 'act':
                 if target == "hq":

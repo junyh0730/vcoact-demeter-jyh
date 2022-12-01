@@ -3,16 +3,19 @@ import os, struct
 from monitor.hq_monitor import HQMonitor
 from monitor.cpu_monitor import CPUMonitor
 from monitor.latency_collector import LatCollector
+import numpy as np
 
 class Monitor():
-    def __init__(self,env):
+    def __init__(self,env,q):
         self.env = env
+        self.q = q
         self.start_time = -1
         self.end_time = -1
         self.hqm = HQMonitor(env)
         self.cpum = CPUMonitor(env)
         self.latency_collector = LatCollector(env)
         self.vsock = None
+
         return
     
     
@@ -41,7 +44,13 @@ class Monitor():
         cpum_rst = self.cpum.get(diff_time)
         p99 = self.latency_collector.getCurLatency()
 
-        #rst = [hqm_rst, cpum_rst]
+        vcpum_rst = np.array([0] * self.env.max_core)
+        while not self.q.empty():
+            vcpu_num, vcpu_util = self.q.get()
+
+            vcpum_rst[int(vcpu_num)] = float(vcpu_util)
+
+        rst = [cpum_rst,vcpum_rst]
         
         if self.env.debug:
             print("monitor diff_time: ",diff_time)
@@ -56,7 +65,7 @@ class Monitor():
                     self.logger.info(strings)
         """
 
-        return cpum_rst,p99
+        return rst,p99
     
     def __get_raw(self):
         cur_time = time.time()
@@ -98,22 +107,21 @@ class Monitor():
     def __send_start_sig(self):
         strings = "".join(["act ", "start ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
-        print('send_start_sig: ',pkt)
         self.vsock.send(pkt)
 
     def __send_end_sig(self):
         strings = "".join(["act ", "end ", "-1 ", "-1 "])
         pkt = strings.encode('utf-8')
-        print('send_end_sig: ',pkt)
         self.vsock.send(pkt)
     
     
-    def set_info(self,target,core_num,util):
+    def set_info(self,target,core_num,util,q):
         if self.env.debug:
             strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
             self.logger.info(strings)
-        strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
-        print(strings)
+        
+        #self.vcpum_rst[int(core_num)] = float(util)
+        q.put([float(core_num),float(util)])
         return
 
     def set_vsock(self,vsock):

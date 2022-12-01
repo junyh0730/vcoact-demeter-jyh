@@ -6,14 +6,14 @@ import time
 
 
 @jit(nopython=True, cache=True)
-def cal_util(rst, cur_vm_core, cur_hq_core):
+def cal_util(cpu_rst,vcpu_rst, cur_vm_core, cur_hq_core):
     vm_util = float(-1)
     vm_util_if_dec = float(-1)
     pkt_util = float(-1)
     pkt_util_if_dec = float(-1)
 
-    arr_vm = np.split(rst, [cur_vm_core])[1]
-    arr_pkt = np.split(rst, [cur_hq_core])[0]
+    arr_vm = np.split(vcpu_rst, [cur_vm_core])[0]
+    arr_pkt = np.split(cpu_rst, [cur_hq_core])[0]
 
     vm_util = np.average(arr_vm)
     pkt_util = np.average(arr_pkt)
@@ -30,9 +30,9 @@ def cal_util(rst, cur_vm_core, cur_hq_core):
 
 
 @jit(nopython=True, cache=True)
-def cal_core_num(rst, cur_vm_core, cur_hq_core, vm_th, pkt_th,max_core):
-    arr_vm = np.split(rst, [cur_vm_core])[1]
-    arr_pkt = np.split(rst, [cur_hq_core])[0]
+def cal_core_num(cpu_rst,vcpu_rst, cur_vm_core, cur_hq_core, vm_th, pkt_th,max_core):
+    arr_vm = np.split(vcpu_rst, [cur_vm_core])[0]
+    arr_pkt = np.split(cpu_rst, [cur_hq_core])[0]
 
     target_vm_core = int(np.ceil(np.sum(arr_vm) / vm_th))
     target_pkt_core = int(np.ceil(np.sum(arr_pkt) / pkt_th))
@@ -96,12 +96,12 @@ class Vcoact():
         #get monitor
         #[hqm_rst, cpum_rst] = rst
 
-
         #cal util
-        cur_vm_core = self.env.cur_vm_core['start']
+        cur_vm_core = self.env.cur_vm_core['end'] - self.env.cur_vm_core['start'] + 1
         cur_hq_core = self.env.cur_hq_core['end'] + 1
+        cpu_rst, vcpu_rst = rst
         vm_util, vm_util_if_dec, pkt_util, pkt_util_if_dec = cal_util(
-            rst,cur_vm_core,cur_hq_core)
+            cpu_rst, vcpu_rst ,cur_vm_core,cur_hq_core)
             
 
         if vm_util < 0 or pkt_util <0:
@@ -165,11 +165,12 @@ class Vcoact():
         [vhost_core,hq_core,vq_core,vm_core,t_core] = self.env.get_cur_core()
    
         #cal util
-        cur_vm_core = self.env.cur_vm_core['start']
+        cur_vm_core = self.env.cur_vm_core['end'] - self.env.cur_vm_core['start'] + 1
         cur_hq_core = self.env.cur_hq_core['end'] + 1
         
+        cpu_rst, vcpu_rst = rst
         target_vm_core, target_pkt_core = cal_core_num(
-            rst, cur_vm_core, cur_hq_core, self.vm_th, self.pkt_th,self.env.max_core)
+            cpu_rst, vcpu_rst, cur_vm_core, cur_hq_core, self.vm_th, self.pkt_th, self.env.max_core)
             
         vm_core['start'] = self.env.max_core - target_vm_core
         t_core['end'] = target_vm_core - 1

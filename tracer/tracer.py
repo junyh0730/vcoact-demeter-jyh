@@ -17,14 +17,15 @@ from bayes_opt import BayesianOptimization, UtilityFunction
 
 
 @jit(nopython=True, cache=True)
-def cal_util(rst, cur_vm_core, cur_hq_core):
+def cal_util(cpu_rst,vcpu_rst, cur_vm_core, cur_hq_core):
     vm_util = float(-1)
     vm_util_if_dec = float(-1)
     pkt_util = float(-1)
     pkt_util_if_dec = float(-1)
 
-    arr_vm = np.split(rst, [cur_vm_core])[1]
-    arr_pkt = np.split(rst, [cur_hq_core])[0]
+
+    arr_vm = np.split(vcpu_rst, [cur_vm_core])[0]
+    arr_pkt = np.split(cpu_rst, [cur_hq_core])[0]
 
     vm_util = np.average(arr_vm)
     pkt_util = np.average(arr_pkt)
@@ -105,7 +106,8 @@ class Tracer():
             prev_vm_core, prev_t_core] = cur_core_alloc
         vm_core_num = prev_vm_core['start']
         pkt_core_num = prev_hq_core['end'] + 1
-        vm_util, temp, pkt_util, temp = cal_util(rst, vm_core_num, pkt_core_num)
+        cpu_rst,vcpu_rst = rst
+        vm_util, temp, pkt_util, temp = cal_util(cpu_rst,vcpu_rst, vm_core_num, pkt_core_num)
 
 
         if self.prev_util != None:
@@ -240,11 +242,12 @@ class Tracer():
 
             #accu util
             #[hqm_rst, cpum_rst] = rst
-            cur_vm_core = self.env.cur_vm_core['start']
+            cur_vm_core = vm_core_num
             cur_hq_core = self.env.cur_hq_core['end'] + 1
 
-            arr_vm = np.split(rst, [cur_vm_core])[1]
-            arr_pkt = np.split(rst, [cur_hq_core])[0]
+            cpu_util, vcpu_util = rst
+            arr_vm = np.split(vcpu_util, [cur_vm_core])[0]
+            arr_pkt = np.split(cpu_util, [cur_hq_core])[0]
 
             vm_util = np.average(arr_vm)
             pkt_util = np.average(arr_pkt)
@@ -268,16 +271,24 @@ class Tracer():
         #logger 
         if self.env.mode == 'monitor':
             itr = 0
-            l_acc = self.env.max_core * [0]
+            l_acc_cpu = self.env.max_core * [0]
+            l_acc_vcpu = self.env.max_core * [0]
             for rst in self.l_rst: 
+                cpu, vcpu = rst
                 for i in range(self.env.max_core):
-                    l_acc[i] += rst[i]
+                    l_acc_vcpu[i] += vcpu[i]
+                    l_acc_cpu[i] += cpu[i]
                 itr += 1
-            
-            l_pcpu_avg_util = self.env.max_core * [0]
+
             for i in range(self.env.max_core):
-                avg_util = l_acc[i] / itr
-                strings = 'info pcpu '+str(i) + ' ' +str(avg_util)
+                avg_vcpu_util = l_acc_vcpu[i] / itr
+                strings = 'info vcpu '+str(i) + ' ' +str(avg_vcpu_util)
+                self.logger.info(strings)
+
+
+            for i in range(self.env.max_core):
+                avg_cpu_util = l_acc_cpu[i] / itr
+                strings = 'info pcpu '+str(i) + ' ' +str(avg_cpu_util)
                 self.logger.info(strings)
 
         return stat

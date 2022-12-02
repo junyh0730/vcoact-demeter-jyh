@@ -1,6 +1,6 @@
 import time
 from monitor.vm.task_monitor_vm import TaskMonitorVM
-from monitor.vm.vq_monitor_vm import VQMonitorVM 
+#from monitor.vm.vq_monitor_vm import VQMonitorVM 
 import threading
 
 class MonitorVM():

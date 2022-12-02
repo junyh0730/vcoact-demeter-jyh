@@ -1,6 +1,6 @@
 import time
 import os, struct
-from monitor.hq_monitor import HQMonitor
+#from monitor.hq_monitor import HQMonitor
 from monitor.cpu_monitor import CPUMonitor
 from monitor.latency_collector import LatCollector
 import numpy as np
@@ -11,7 +11,7 @@ class Monitor():
         self.q = q
         self.start_time = -1
         self.end_time = -1
-        self.hqm = HQMonitor(env)
+        #self.hqm = HQMonitor(env)
         self.cpum = CPUMonitor(env)
         self.latency_collector = LatCollector(env)
         self.vsock = None

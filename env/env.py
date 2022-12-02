@@ -4,13 +4,15 @@ class Environment():
     def __init__(self):
         self.max_core = multiprocessing.cpu_count()
         print("max_core: ", self.max_core)
-        self.netinf_name = "enp101s0f0"
-        self.vnetinf_name = "enp1s0"
-        self.server_ip = "10.150.21.215"
+        #self.netinf_name = "enp101s0f0"
+        self.netinf_name = "enp3s0"
+        self.vnetinf_name = "ens3"
+        #self.server_ip = "10.150.21.215"
+        self.server_ip = "10.150.4.189"
         self.vm_name = "ubuntu18.04"
 
-        self.debug = False
-        #self.debug = True
+        #self.debug = False
+        self.debug = True
         self.mode = "monitor" 
         #self.mode = "vcoact" 
         self.is_tracer = True

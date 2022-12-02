@@ -4,7 +4,7 @@ from monitor.monitor import Monitor
 from policy.vcoact import Vcoact
 from vsock.vsock_hyp import VSockHYP
 from actor.actor_hyp import ActorHyp
-from tracer.tracer import Tracer
+#from tracer.tracer import Tracer
 import time
 import logging
 from multiprocessing import Queue
@@ -14,7 +14,8 @@ from multiprocessing import Queue
 numba_logger = logging.getLogger('numba')
 numba_logger.setLevel(logging.WARNING)
 
-sys.path.append("/home/caslab/vcoact")
+#sys.path.append("/home/caslab/vcoact")
+sys.path.append("/home/jyh/vcoact")
 
 env = Environment()
 
@@ -26,8 +27,8 @@ def run():
     vsock_hyp = VSockHYP(env, monitor, actor_hyp,q)
     agent = Vcoact(env)
     tracer = None
-    if env.is_tracer:
-        tracer = Tracer(env, monitor)
+    #if env.is_tracer:
+        #tracer = Tracer(env, monitor)
 
     #init
     vsock_hyp.start()

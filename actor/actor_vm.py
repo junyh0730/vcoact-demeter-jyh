@@ -51,7 +51,7 @@ class ActorVM():
                 os.close(fd_irq_aff_list)
     
     def __open_fd_xps(self):
-        for core in range(self.env.max_core):
+        for core in range(0,1):#in range(self.env.max_core):
             fd = os.open("/sys/class/net/" + str(self.env.vnetinf_name) +
                                  "/queues/tx-" + str(core) + "/xps_cpus", os.O_RDWR)
             self.l_fd_xps.append(fd)
@@ -64,13 +64,18 @@ class ActorVM():
     
     def __init_cset_ctrl(self):
         t = trees.Tree()
+        print(t.root)
+        print(t.root.children)
         cset = t.get_node_by_path('/cpuset/')
+        print(cset)
         cset_tasks = None
         try:
             cset_tasks = cset.create_cgroup('all_thread')
+            print("init cset ctrl try!!! create cgroup")
         except:
             cset_tasks = t.get_node_by_path('/cpuset/all_thread')
-
+            print("init cset ctrl except!!! get bide by path!!")
+            
         self.cset_ctrl = cset_tasks.controller
 
         grep_cmd = "ps -eLF |awk '{print $4}' | awk '{if (NR!=1) {print}}'"
@@ -87,7 +92,7 @@ class ActorVM():
     
     def __init_actor(self):
         self.alloc_t_core(self.env.cur_t_core)
-        self.alloc_vq_core(self.env.cur_vq_core)
+        #self.alloc_vq_core(self.env.cur_vq_core)
         return
     
     def alloc_t_core(self,target):

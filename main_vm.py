@@ -15,15 +15,9 @@ end_e = multiprocessing.Event()
 
 def run():
     global env,start_e,end_e
-    print("start vsock_vm_daemon = VSockVM(actor,env,start_e,end_e)!!!")
-
     actor = ActorVM(env)
-    print("start vsock_vm_daemon = VSockVM(actor,env,start_e,end_e)!!!")
     vsock_vm_daemon = VSockVM(actor,env,start_e,end_e)
-    print("start vsock_vm_daemon.start()!!!")
     vsock_vm_daemon.start()
-    
-    print("start main loop!!!")
         
     main_loop(vsock_vm_daemon, actor)
         

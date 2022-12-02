@@ -66,7 +66,7 @@ class ActorHyp():
     def __init_actor(self):
         self.__alloc_vm_core(self.env.cur_vm_core)
         self.__alloc_vhost_core(self.env.cur_vhost_core)
-        self.__alloc_hq_core(self.env.cur_hq_core)
+        #self.__alloc_hq_core(self.env.cur_hq_core)
         return
 
     
@@ -119,10 +119,11 @@ class ActorHyp():
         return
     
     def __open_fd_xps(self):
-        for core in range(self.env.max_core):
+        for core in range(0,1):#in range(self.env.max_core):
             fd = os.open("/sys/class/net/" + str(self.env.netinf_name) +
                                  "/queues/tx-" + str(core) + "/xps_cpus", os.O_WRONLY)
             self.l_fd_xps.append(fd)
+            print("l_fd_xps append : %d ", fd) # jyh
         return
     
     def __close_fd_xps(self):
@@ -132,7 +133,10 @@ class ActorHyp():
     
     def __init_cset_ctrl(self):
         t = trees.Tree()
+        print(t.root)
+        print(t.root.children)
         cset = t.get_node_by_path('/cpuset/')
+        print(cset)
         cset_vhost = None
         try:
             cset_vhost = cset.create_cgroup('vhost')

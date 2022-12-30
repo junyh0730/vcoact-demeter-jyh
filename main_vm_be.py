@@ -5,7 +5,8 @@ sys.path.append("/home/vm/vcoact-demeter/vcoact")
 
 from env.env import Environment
 from monitor.vm.monitor_vm import MonitorVM
-from vsock.vsock_vm import VSockVM
+#from vsock.vsock_vm import VSockVM
+from vsock.vsock_vm_be import VSockVM
 from vsock.parser import Parser
 from actor.actor_vm import ActorVM
 
@@ -74,7 +75,7 @@ def main_loop(vsock_vm_daemon, actor):
             # rst, traffic, wait_time = monitor_vm.get()
             rst, traffic = monitor_vm.get()
             #sendInfo(vsock_vm_daemon, rst)
-            sendInfo_traffic(vsock_vm_daemon, traffic)
+            #sendInfo_traffic(vsock_vm_daemon, traffic)
             #sendInfo_traffic(vsock_vm_daemon, wait_time)
             #print("send info")
             #sendInfo(vsock_vm_daemon, rst)

@@ -10,18 +10,30 @@ class VSockVM(VSock):
 
         self.env = env
         self.user = "vm"
-        CID_VM = 3
+        
+        """
+        CID_VM = 4
         self.TX_CID = socket.VMADDR_CID_HOST
         self.TX_PORT = 9999
         self.RX_CID = CID_VM
         self.RX_PORT = 9998
-
+        """
+        CID_VM_LC = 4
+        CID_VM_BE = 3
+        self.TX_CID_LC = socket.VMADDR_CID_HOST
+        self.TX_CID_BE = socket.VMADDR_CID_HOST
+        self.TX_PORT_LC = 9999
+        self.TX_PORT_BE = 9998
+        self.RX_CID_LC = CID_VM_LC
+        self.RX_CID_BE = CID_VM_BE
+        self.RX_PORT_LC = 9997
+        self.RX_PORT_BE = 9996
+        
         self.actor_vm = actor_vm
         self.rx_data = bytearray()
 
         self.start_e = start_e
         self.end_e = end_e
-        
 
     
     def start(self):
@@ -29,9 +41,9 @@ class VSockVM(VSock):
             return None
 
         try: 
-            super()._start_tx()
+            super()._start_tx_be()
             print("super()._start_rx(None)")
-            super()._start_rx(None)
+            super()._start_rx_be(None)
 
         except:
             print("vsock: start error in vm")

@@ -98,6 +98,7 @@ def sendInfo(vsock_vm_daemon, rst):
 
 if __name__ == "__main__":
     try:
+        print("start run!!!")
         run()
     except KeyboardInterrupt:
         sys.exit(0)

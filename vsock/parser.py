@@ -39,6 +39,15 @@ class Parser():
         s_info = s_info.encode('utf-8')
         return s_info
     
+    def transTrafficToPkt(target, utils):
+        s_info = ""
+        l_s = list()
+        s = ["info_traffic ",str(target)," " ,str(0)," ",str(utils)," \n"]
+        l_s.extend(s)
+        s_info = s_info.join(l_s)
+        s_info = s_info.encode('utf-8')
+        return s_info
+    
     def transActToPkt(target, core_num):
         act=""
         act = act.join(["act ", str(target), " ", str(core_num), " \n"])

@@ -3,17 +3,22 @@ import os, struct
 #from monitor.hq_monitor import HQMonitor
 from monitor.cpu_monitor import CPUMonitor
 from monitor.latency_collector import LatCollector
+from monitor.traffic_monitor import TrafficMonitor
+from monitor.wait_monitor import WaitMonitor
 import numpy as np
 
 class Monitor():
     def __init__(self,env,q):
         self.env = env
         self.q = q
+        self.traffic_info = 0
         self.start_time = -1
         self.end_time = -1
         #self.hqm = HQMonitor(env)
         self.cpum = CPUMonitor(env)
         self.latency_collector = LatCollector(env)
+        self.traffic = TrafficMonitor(env)
+        self.wait_monitor = WaitMonitor(env)
         self.vsock = None
 
         return
@@ -26,6 +31,8 @@ class Monitor():
         self.__send_start_sig()
         #self.hqm.start()
         self.cpum.start()
+        self.wait_monitor.start()
+        #self.traffic.start()
         return
 
     
@@ -34,6 +41,8 @@ class Monitor():
         self.__send_end_sig()
         #self.hqm.end()
         self.cpum.end()
+        self.wait_monitor.end()
+        #self.traffic.end()
         self.end_time = time.time()
         return
     
@@ -42,15 +51,27 @@ class Monitor():
         diff_time = (self.end_time - self.start_time) * 1000 * 1000 * 1000  #ns
         #hqm_rst = self.hqm.get(diff_time)
         cpum_rst = self.cpum.get(diff_time)
+        wait_time = self.wait_monitor.get(diff_time)
         p99 = self.latency_collector.getCurLatency()
+        #traffic = self.traffic.get(diff_time)
+        vmtraffic = -1
+        # wait_time = -1
 
         vcpum_rst = np.array([0] * self.env.max_core)
         while not self.q.empty():
-            vcpu_num, vcpu_util = self.q.get()
+            #print("not in queue!! : ",self.q)
+            if self.env.mode == "demeter":
+                vmtraffic = int(self.q.get())
+                #wait_time = float(self.q.get())
+            else:
+                vcpu_num, vcpu_util = self.q.get()
 
-            vcpum_rst[int(vcpu_num)] = float(vcpu_util)
+                vcpum_rst[int(vcpu_num)] = float(vcpu_util)
 
         rst = [cpum_rst,vcpum_rst]
+        
+        #active_lc_vcpu_core_num = self.env.cur_lc_vcpu_core['end'] - self.env.cur_lc_vcpu_core['start'] + 1
+        #per_core_half_polling_util = 100 * halt_polling_time_ns / diff_time / active_lc_vcpu_core_num
         
         if self.env.debug:
             print("monitor diff_time: ",diff_time)
@@ -65,7 +86,7 @@ class Monitor():
                     self.logger.info(strings)
         """
 
-        return rst,p99
+        return rst,p99, vmtraffic, wait_time
     
     def __get_raw(self):
         cur_time = time.time()
@@ -119,9 +140,19 @@ class Monitor():
         if self.env.debug:
             strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
             self.logger.info(strings)
-        
         #self.vcpum_rst[int(core_num)] = float(util)
         q.put([float(core_num),float(util)])
+        return
+    
+    def set_info_traffic(self,target,core_num,util,q):
+        if self.env.debug:
+            strings = 'info '+str(target)+ ' ' +str(core_num) + ' ' +str(util)
+            self.logger.info(strings)
+        #self.vcpum_rst[int(core_num)] = float(util)
+        #q.put([float(core_num),float(util)])
+        #self.traffic_info = int(util)
+        q.put(util)
+        #print("set_info_traffic!!!!!!!",self.traffic_info)
         return
 
     def set_vsock(self,vsock):

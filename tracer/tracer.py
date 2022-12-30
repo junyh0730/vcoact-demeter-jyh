@@ -14,17 +14,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from mlxtend.plotting import plot_decision_regions
 from bayes_opt import BayesianOptimization, UtilityFunction
+from th_finder.th_finder import ThFinder
 
 
 @jit(nopython=True, cache=True)
-def cal_util(cpu_rst,vcpu_rst, cur_vm_core, cur_hq_core):
+def cal_util(cpu_rst, vcpu_rst, cur_lc_vcpu_core, cur_hq_core):
     vm_util = float(-1)
     vm_util_if_dec = float(-1)
     pkt_util = float(-1)
     pkt_util_if_dec = float(-1)
 
-
-    arr_vm = np.split(vcpu_rst, [cur_vm_core])[0]
+    arr_vm = np.split(vcpu_rst, [cur_lc_vcpu_core])[0]
     arr_pkt = np.split(cpu_rst, [cur_hq_core])[0]
 
     vm_util = np.average(arr_vm)
@@ -34,8 +34,6 @@ def cal_util(cpu_rst,vcpu_rst, cur_vm_core, cur_hq_core):
         vm_util_if_dec = np.sum(arr_vm)/(len(arr_vm) - 1)
     if len(arr_pkt) != 1:
         pkt_util_if_dec = np.sum(arr_pkt)/(len(arr_pkt) - 1)
-    
-    
 
     return vm_util, vm_util_if_dec, pkt_util, pkt_util_if_dec
 
@@ -49,6 +47,10 @@ class Tracer():
         self.l_action = list()
         self.start_engy = -1
         self.end_engy = -1
+
+        self.th_weight = 0.7
+
+        self.explorer_th = 50
 
         #init logger
         #create logger instance
@@ -64,13 +66,13 @@ class Tracer():
         self.logger.setLevel(level=logging.INFO)
 
         #dataframe
-        self.key = ["prev_vm_core", "prev_pkt_core", "prev_vm_util",
-                    "prev_pkt_util", "vm_core", "pkt_core", "vm_util", "pkt_util", "p99"]
+        self.key = ["prev_lc_vcpu_core", "prev_pkt_core", "prev_vm_util",
+                    "prev_pkt_util", "lc_vcpu_core", "pkt_core", "vm_util", "pkt_util", "p99"]
         self.df = pd.DataFrame(columns=self.key)
 
         #th
-        self.vm_th = 99
-        self.pkt_th = 99
+        self.vm_th = 90
+        self.pkt_th = 90
 
         #prev
         self.prev_core_alloc = None
@@ -82,7 +84,9 @@ class Tracer():
                                          pbounds={"vm_th": [1, 99],
                                                   "pkt_th": [1, 99]},
                                          verbose=2, random_state=1234)
-        self.utility = UtilityFunction(kind = "ucb", kappa = 1.2, xi = 0.01)
+        self.utility = UtilityFunction(kind = "ucb", kappa = 1.96, xi = 0.01)
+
+        #self.th_finder = ThFinder(self.env.slo)
 
 
         self.reset()    
@@ -103,22 +107,40 @@ class Tracer():
         self.l_action.append(cur_core_alloc)
 
         [prev_vhost_core, prev_hq_core, prev_vq_core,
-            prev_vm_core, prev_t_core] = cur_core_alloc
-        vm_core_num = prev_vm_core['start']
+            prev_lc_vcpu_core, prev_t_core] = cur_core_alloc
+        lc_vcpu_core_num = prev_lc_vcpu_core['start']
         pkt_core_num = prev_hq_core['end'] + 1
         cpu_rst,vcpu_rst = rst
-        vm_util, temp, pkt_util, temp = cal_util(cpu_rst,vcpu_rst, vm_core_num, pkt_core_num)
+        vm_util, temp, pkt_util, temp = cal_util(cpu_rst,vcpu_rst, lc_vcpu_core_num, pkt_core_num)
 
 
         if self.prev_util != None:
             self.df.loc[len(self.df)] = [*self.prev_core_alloc, *self.prev_util,
-                                         vm_core_num, pkt_core_num, vm_util, pkt_util, p99]
+                                         lc_vcpu_core_num, pkt_core_num, vm_util, pkt_util, p99]
 
-        self.prev_core_alloc = [vm_core_num,pkt_core_num]
+        self.prev_core_alloc = [lc_vcpu_core_num,pkt_core_num]
         self.prev_util = [vm_util,pkt_util]
+
+        if len(self.df) > self.explorer_th:
+            thread = threading.Thread(target=self.__th_finder_thread)
+            thread.daemon = True
+            thread.start()
+            
 
         
         return True
+    
+    def __th_finder_thread(self):
+        self.vm_th, self.pkt_th = self.th_finder.cal_th(self.df, self.vm_th,self.pkt_th,self.th_weight)
+        #self.vm_th = self.th_weight * self.vm_th + (1-self.th_weight) * vm_th
+        #self.pkt_th = self.th_weight * self.pkt_th + (1-self.th_weight) * pkt_th
+
+
+        print("weighted vm th: ", self.vm_th, "weighted pkt th: ", self.pkt_th)
+
+        self.df = pd.DataFrame(columns=self.key)
+        return 
+
     
     def reset(self):
         self.is_running = False
@@ -176,13 +198,8 @@ class Tracer():
                 stat = self.__cal_stat()
                 self.__write_log(stat)
 
-                #df
-                #pearson_corr = self.df.corr(method='pearson')
                 #self.df.to_csv("df.csv")
-                
-                self.__cal_th(stat)
-                #self.df = pd.read_csv("df.csv")
-                
+                            
 
     def __write_log(self, stat):
         l_str = ["avg_vm_num", "avg_pkt_num",
@@ -192,6 +209,7 @@ class Tracer():
         
         return None
     
+    """
     def __cal_th(self,stat):
         
         target = self.__obj_func(stat)
@@ -201,31 +219,25 @@ class Tracer():
         except KeyError:
             print("same point")
             pass
-
         #update
         next_th = self.optimizer.suggest(self.utility)
         next_th['vm_th'] = int(next_th['vm_th'])
         next_th['pkt_th'] = int(next_th['pkt_th'])
         self.vm_th = next_th['vm_th']
         self.pkt_th = next_th['pkt_th']
-
         print("vm th: ", self.vm_th, "pkt th: ", self.pkt_th)
     
     def __obj_func(self,stat):
-        alpha = 0.7
+        alpha = 0.5
         target = 0
         total_guart_pctg = 1 - (self.slo_vio_count * 1.0 / self.itr)
         print("slo guart. pctg: ", total_guart_pctg)
-
-
         [avg_vm_num, avg_pkt_num, avg_vm_util, avg_pkt_util, engy] = stat
-
         target = alpha * total_guart_pctg + \
-            (1-alpha) * (avg_vm_util + avg_pkt_util) / 2
-
+            (1-alpha) * (avg_vm_util + avg_pkt_util) / 200
+        print("obj score: ", target)
         return target
-
-
+    """
 
     
 
@@ -233,20 +245,20 @@ class Tracer():
         accu = [0,0,0,0]
         for action, rst in zip(self.l_action, self.l_rst):
             #accu core_num
-            [vhost_core,hq_core,vq_core,vm_core,t_core] = action
-            vm_core_num = vm_core['end'] - vm_core['start'] + 1
+            [vhost_core,hq_core,vq_core,lc_vcpu_core,t_core] = action
+            lc_vcpu_core_num = lc_vcpu_core['end'] - lc_vcpu_core['start'] + 1
             pkt_core_num = hq_core['end'] - hq_core['start'] + 1
 
-            accu[0] += vm_core_num
+            accu[0] += lc_vcpu_core_num
             accu[1] += pkt_core_num
 
             #accu util
             #[hqm_rst, cpum_rst] = rst
-            cur_vm_core = vm_core_num
+            cur_lc_vcpu_core = lc_vcpu_core_num
             cur_hq_core = self.env.cur_hq_core['end'] + 1
 
             cpu_util, vcpu_util = rst
-            arr_vm = np.split(vcpu_util, [cur_vm_core])[0]
+            arr_vm = np.split(vcpu_util, [cur_lc_vcpu_core])[0]
             arr_pkt = np.split(cpu_util, [cur_hq_core])[0]
 
             vm_util = np.average(arr_vm)
@@ -254,7 +266,7 @@ class Tracer():
 
             accu[2] += vm_util
             accu[3] += pkt_util
-
+        
         # cal avg_core_num and avg_util
         avg_vm_num = round(accu[0] / self.itr,1)
         avg_pkt_num = round(accu[1] / self.itr,1)

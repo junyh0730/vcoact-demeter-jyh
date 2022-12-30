@@ -5,7 +5,8 @@ sys.path.append("/home/vm/vcoact-demeter/vcoact")
 
 from env.env import Environment
 from monitor.vm.monitor_vm import MonitorVM
-from vsock.vsock_vm import VSockVM
+#from vsock.vsock_vm import VSockVM
+from vsock.vsock_vm_lc import VSockVM
 from vsock.parser import Parser
 from actor.actor_vm import ActorVM
 

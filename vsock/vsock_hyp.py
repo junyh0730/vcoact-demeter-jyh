@@ -11,13 +11,24 @@ class VSockHYP(VSock):
         self.user = "hyp"
         self.monitor = monitor
         self.actor = actor
-
+        
         CID_VM = 3
         self.RX_CID = socket.VMADDR_CID_HOST
         self.RX_PORT = 9999
         self.TX_CID = CID_VM
         self.TX_PORT = 9998
-
+        """
+        CID_VM_LC = 4
+        CID_VM_BE = 3
+        self.RX_CID_LC = socket.VMADDR_CID_HOST
+        self.RX_CID_BE = socket.VMADDR_CID_HOST
+        self.RX_PORT_LC = 9999
+        self.RX_PORT_BE = 9998
+        self.TX_CID_LC = CID_VM_LC
+        self.TX_CID_BE = CID_VM_BE
+        self.TX_PORT_LC = 9997
+        self.TX_PORT_BE = 9996
+        """
         self.rx_data = bytearray() 
 
     
@@ -28,6 +39,7 @@ class VSockHYP(VSock):
         try: 
             super()._start_rx(self.q)
             time.sleep(3)
+            print("super()._start_tx()")
             super()._start_tx()
         except:
             print("vsock: start error in hyp")
@@ -53,7 +65,8 @@ class VSockHYP(VSock):
             #collecct info
             if types == 'info':
                 self.monitor.set_info(target, core_num, util,q)
-
+            elif types == 'info_traffic':
+                self.monitor.set_info_traffic(target, core_num, util,q)
             elif types == 'act':
                 if target == "hq":
                     self.actor.alloc_hq_core(core_num)
